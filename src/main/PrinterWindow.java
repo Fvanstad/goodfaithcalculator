@@ -1,49 +1,36 @@
 package main;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.DefaultListModel;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.LayoutStyle.ComponentPlacement;
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Scanner;
-import java.awt.event.ActionEvent;
-import javax.swing.SwingConstants;
-import javax.swing.UIManager;
 
-import java.awt.Component;
-import javax.swing.JList;
-import javax.swing.JScrollPane;
-import javax.swing.ListModel;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
-import java.awt.Font;
-import javax.swing.JTree;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeModel;
-
-
-
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.JTree;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.WindowConstants;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 public class PrinterWindow extends JDialog {
-	
+
 	private static Controller controller;
 	public TablePane tablePane;
 	protected Patient patient;
-	
+
 	private JPanel buttonPane;
 	private JButton printButton;
 	private JButton cancelButton;
@@ -58,21 +45,21 @@ public class PrinterWindow extends JDialog {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			new PrinterWindow(controller);
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	protected class Patient{
-		
+
 		protected String firstName = "(!*NO FIRST NAME*!)";
 		protected String lastName = "(!*NO LAST NAME*!)";
 		protected String DOB = "(!*NO DOB*!)";
-		
+
 		protected String address = "(!*NO ADDRESS*!)";
 		protected String phone = "(!*NO Phone*!)";
-		
+
 		public Patient(String firstName, String lastName, String DOB) {
 			this.firstName = firstName;
 			this.lastName = lastName;
@@ -80,12 +67,12 @@ public class PrinterWindow extends JDialog {
 			//this.address = address;
 			//this.phone = phone;
 		}
-		
+
 	}
 
-	
+
 	public PrinterWindow(Controller x) {
-		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setVisible(true);
 		setTitle("Print Calculation");
 		controller = x;
@@ -97,6 +84,7 @@ public class PrinterWindow extends JDialog {
 			{
 				printButton = new JButton("Print");
 				printButton.addActionListener(new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						printTemplate();
 					}
@@ -107,6 +95,7 @@ public class PrinterWindow extends JDialog {
 			{
 				cancelButton = new JButton("Cancel");
 				cancelButton.addActionListener(new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						dispose();
 					}
@@ -133,10 +122,10 @@ public class PrinterWindow extends JDialog {
 					.addComponent(buttonPane, GroupLayout.PREFERRED_SIZE, 42, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap())
 		);
-		
+
 		JScrollPane scrollPane = new JScrollPane();
-		
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+
+		JTabbedPane tabbedPane = new JTabbedPane(SwingConstants.TOP);
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.TRAILING)
@@ -155,29 +144,29 @@ public class PrinterWindow extends JDialog {
 					.addContainerGap())
 		);
 		gl_panel.linkSize(SwingConstants.VERTICAL, new Component[] {scrollPane, tabbedPane});
-		
+
 		JPanel panel_1_1 = new JPanel();
 		tabbedPane.addTab("Patient Information", null, panel_1_1, null);
-		
+
 		JLabel lblNewLabel_1_2 = new JLabel("First Name:");
 		lblNewLabel_1_2.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblNewLabel_1_2.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		
+
 		firstNameTF = new JTextField();
 		firstNameTF.setColumns(10);
-		
+
 		JLabel lblNewLabel_1_1_1 = new JLabel("Last Name:");
 		lblNewLabel_1_1_1.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblNewLabel_1_1_1.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		
+
 		lastNameTF = new JTextField();
 		lastNameTF.setColumns(10);
-		
+
 		JLabel lblNewLabel_1_1_1_1 = new JLabel("DOB:");
 		lblNewLabel_1_1_1_1.setToolTipText("MM/DD/YYYY");
 		lblNewLabel_1_1_1_1.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblNewLabel_1_1_1_1.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		
+
 		DOBTF = new JTextField();
 		DOBTF.setToolTipText("MM/DD/YYYY");
 		DOBTF.setColumns(10);
@@ -223,30 +212,32 @@ public class PrinterWindow extends JDialog {
 					.addContainerGap(120, Short.MAX_VALUE))
 		);
 		panel_1_1.setLayout(gl_panel_1_1);
-		
+
 		JPanel panel_1 = new JPanel();
 		tabbedPane.addTab("User Information", null, panel_1, null);
-		
+
 		userNameTF = new JTextField(controller.userName);
 		userNameTF.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				controller.setUserName(userNameTF.getText());
 			}
 		});
 		userNameTF.setColumns(10);
-		
+
 		JLabel lblNewLabel_1 = new JLabel("Full Name:");
 		lblNewLabel_1.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		lblNewLabel_1.setHorizontalAlignment(SwingConstants.RIGHT);
-		
+
 		userTitleTF = new JTextField(controller.userTitle);
 		userTitleTF.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				controller.setTitle(userTitleTF.getText());
 			}
 		});
 		userTitleTF.setColumns(10);
-		
+
 		JLabel lblNewLabel_1_1 = new JLabel("Title:");
 		lblNewLabel_1_1.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblNewLabel_1_1.setFont(new Font("Tahoma", Font.PLAIN, 14));
@@ -282,11 +273,11 @@ public class PrinterWindow extends JDialog {
 					.addContainerGap(146, Short.MAX_VALUE))
 		);
 		panel_1.setLayout(gl_panel_1);
-		
+
 		JLabel lblNewLabel = new JLabel("Select a Template:");
 		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		scrollPane.setColumnHeaderView(lblNewLabel);
-		
+
 		fileTree = new JTree();
 		scrollPane.setViewportView(fileTree);
 		fileTree.setModel(new DefaultTreeModel(
@@ -318,103 +309,103 @@ public class PrinterWindow extends JDialog {
 		gl_buttonPane.linkSize(SwingConstants.HORIZONTAL, new Component[] {printButton, cancelButton});
 		buttonPane.setLayout(gl_buttonPane);
 		getContentPane().setLayout(groupLayout);
-		
+
 		getTemplates();
 	}
-	
+
 	public void createPatientClass() {
-		
+
 		patient = new Patient(firstNameTF.getText(), lastNameTF.getText(), DOBTF.getText());
-		
+
 	}
-	
+
 	public void getTemplates() {
-		
+
 		File fileLocation;
 		File[] filesList;
 		final ArrayList<DefaultMutableTreeNode> nodes = new ArrayList();
-		
+
 		try {
-			fileLocation = new File(controller.templateFileLocation);
+			fileLocation = new File(Controller.templateFileLocation);
 			filesList = fileLocation.listFiles();
-			
+
 		} catch (Exception e) {
 			return;
 		}
-		
+
 		for (File x : filesList) {
-			
+
 			nodes.add(new DefaultMutableTreeNode(x));
-			
+
 		}
-		
+
 		fileTree.setModel(new DefaultTreeModel(
 				new DefaultMutableTreeNode("templates") {
 					{
 						for(DefaultMutableTreeNode x : nodes) {
 							add(new DefaultMutableTreeNode(x));
-							
+
 						}
 					}
 				}
 			));
-		
+
 	}
-	
+
 	public void printTemplate() {
-		
+
 		if(tablePane.tableMain.getRowCount() > 0) {
-			
+
 			createPatientClass();
-			
+
 			HashMap<String, String> printElements = new HashMap();
-			
+
 			printElements.put("{{userName}}", controller.userName);
 			printElements.put("{{userTitle}}", controller.userTitle);
-			
+
 			printElements.put("{{locationOfCare.name}}", controller.locationOfCare.name);
 			printElements.put("{{locationOfCare.address}}", controller.locationOfCare.address);
 			printElements.put("{{locationOfCare.phone}}", controller.locationOfCare.phone);
 			printElements.put("{{locationOfCare.fax}}", controller.locationOfCare.fax);
-			
+
 			printElements.put("{{patient.firstName}}", patient.firstName);
 			printElements.put("{{patient.lastName}}", patient.lastName);
 			printElements.put("{{patient.DOB}}", patient.DOB);
 			printElements.put("{{patient.address}}", patient.address);
 			printElements.put("{{patient.phone}}", patient.phone);
-			
+
 			ArrayList<String> rowData = new ArrayList(tablePane.tableMain.getRowCount());
 			String rowString;
-			
+
 			//rowData "cptCode|description|copayAmnt|coinsuranceAmnt|toDeductible|remainingDeductibletoMeet|rowTotal" last index will only be the final total.
-			
+
 			for(int i = 0; i < tablePane.tableMain.getRowCount(); i++) {
 				rowString = "";
 				for (int j = 0; j < tablePane.tableMain.getColumnCount(); j++) {
 					if(j == 1) {
-						rowString += controller.codeDescriptions.get(tablePane.tableMain.getValueAt(i,0).toString()) + "|";
+						rowString += Controller.codeDescriptions.get(tablePane.tableMain.getValueAt(i,0).toString()) + "|";
 						continue;
 					}
 					if((j+1) != tablePane.tableMain.getColumnCount()){
 						rowString += tablePane.tableMain.getValueAt(i,j).toString() + "|";
-					}else{			
+					}else{
 						rowString += tablePane.tableMain.getValueAt(i,j).toString();
 					}
-					
+
 				}
-				
+
 				rowData.add(rowString);
-				
+
 			}
-			
+
 			System.out.println("(printTemplate) " + rowData);
 			System.out.println("(printTemplate) " + fileTree.getLastSelectedPathComponent());
-			
-			
-			
-			
-			
+
+
+
+
+
 		}
-		
+
 	}
 }
