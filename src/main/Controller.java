@@ -1,21 +1,30 @@
 package main;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Properties;
 import java.util.Scanner;
 import java.util.TreeMap;
 
+import javax.swing.JOptionPane;
+
 public class Controller {
+	
+	Properties properties = new Properties();
+	FileInputStream inputStream;
 
 	private static Scanner scanner;
-    private static String fileLocation = "feeDB.csv";
+    private static String codeFileLocation;
     private static File feeDBFile;
 
     public static Scanner templateScanner;
-    public static String templateFileLocation = "templates";
+    public static String templatesFolderLocation;
 
     public static ArrayList<String> insuranceNames;
 	public static HashMap<String, HashMap<String, ArrayList>> codes;
@@ -24,8 +33,8 @@ public class Controller {
 	public static HashMap<String, ArrayList> insuranceCompaniesMap;
 	public static int favoritesLimit = 40;
 
-	public String userName = System.getProperty("user.name");
-	public String userTitle = "Billing Specialist";
+	public String userName;
+	public String userTitle;
 	public locationOfCare locationOfCare = new locationOfCare();
 
 	public class locationOfCare {
@@ -41,18 +50,34 @@ public class Controller {
 
 	}
 
-
-
 	public static boolean hideCodesSetting = false;
 
 	public Controller() {
-
-		readFile();
+		readConfigFile();
+		readCodeFile();
 
 	}
 
-
-	public static void readFile() {
+	public void readConfigFile() {
+		
+		try {
+			inputStream = new FileInputStream("config.properties");
+			properties.load(inputStream);
+			codeFileLocation = properties.getProperty("codeFileLocation");
+			templatesFolderLocation = properties.getProperty("templatesFolderLocation");
+			
+			if(properties.containsKey(System.getProperty("user.name"))) {
+				userName = properties.getProperty(System.getProperty("user.name")).split("\\|")[0];
+				userTitle = properties.getProperty(System.getProperty("user.name")).split("\\|")[1];	
+			}	
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, "There was an error trying to find the config file.");
+			return;
+		}
+		
+	}
+	
+	public static void readCodeFile() {
 
 		insuranceNames = new ArrayList<>();
 
@@ -72,7 +97,7 @@ public class Controller {
         favoriteCodeDescriptions = new TreeMap<>();
 
         try {
-        	feeDBFile = new File(fileLocation);
+        	feeDBFile = new File(codeFileLocation);
         	scanner = new Scanner(feeDBFile);
 		}catch (Exception e) {
 			return;
@@ -153,5 +178,36 @@ public class Controller {
 
 	}
 
-
+	public void saveUserInfo(String x, String y) {
+		
+		FileOutputStream outputStream;
+		
+		try {
+			outputStream = new FileOutputStream("config.properties");
+			
+			if(!properties.containsKey(System.getProperty("user.name"))) {
+				
+				properties.put(System.getProperty("user.name"), x + "|" + y);
+				properties.store(outputStream, null);
+				System.out.println("(saveUserInfo) saving new user");
+				
+			}else {
+				
+				properties.setProperty(System.getProperty("user.name"), x + "|" + y);
+				properties.store(outputStream, null);
+				System.out.println("(saveUserInfo) saving current user");
+				
+			}
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, "There was an error trying to save to the config file.");
+			e.printStackTrace();
+			return;
+		}
+		
+		
+		
+		
+	}
+		
+	
 	}

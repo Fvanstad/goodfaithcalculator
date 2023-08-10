@@ -48,6 +48,7 @@ public class TablePane extends JPanel{
 	private JLabel displayDeductibleTextField;
 	private Controller controller;
 	public JLabel totalLabel;
+	public double finalTotal;
 
 	private long previousCalculateCall;
 	private JLabel insuranceCount;
@@ -191,6 +192,7 @@ public class TablePane extends JPanel{
 				catch(Exception x){
 					displayDeductibleTextField.setForeground(Color.red);
 				}
+				calculateTotal();
 			}
 		});
 
@@ -316,7 +318,7 @@ public class TablePane extends JPanel{
 		displayDeductibleTextField.setHorizontalAlignment(SwingConstants.LEFT);
 		displayDeductibleTextField.setFont(new Font("Tahoma", Font.PLAIN, 14));
 
-		JButton btnNewButton_1 = new JButton("Remove Selected\r\n");
+		JButton btnNewButton_1 = new JButton("Remove Row(s)");
 		btnNewButton_1.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -335,14 +337,32 @@ public class TablePane extends JPanel{
 			}
 		});
 		btnNewButton_1.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		
+		JButton btnNewButton_1_1 = new JButton("Share Co-Insurance\r\n");
+		btnNewButton_1_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				double coInsuranceAmnt = 0.0;
+				for(int i = 0; i < tableMain.getRowCount(); i++) {
+					if(tableMain.getValueAt(i, 4) != null &&(Double.parseDouble(String.valueOf(tableMain.getValueAt(i, 4)))) != 0.0 && coInsuranceAmnt == 0.0) {
+						coInsuranceAmnt = Double.parseDouble(String.valueOf(tableMain.getValueAt(i, 4)));
+					}
+					tableMain.setValueAt(coInsuranceAmnt, i , 4);
+				}
+				calculateTotal();
+			}
+		});
+		btnNewButton_1_1.setToolTipText("Applies the first non-zero co-insurance value to all other rows.");
+		btnNewButton_1_1.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		GroupLayout gl_deducPanel2 = new GroupLayout(deducPanel2);
 		gl_deducPanel2.setHorizontalGroup(
 			gl_deducPanel2.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_deducPanel2.createSequentialGroup()
 					.addContainerGap()
 					.addComponent(displayDeductibleTextField, GroupLayout.PREFERRED_SIZE, 319, GroupLayout.PREFERRED_SIZE)
-					.addGap(313)
-					.addComponent(btnNewButton_1, GroupLayout.DEFAULT_SIZE, 124, Short.MAX_VALUE)
+					.addGap(174)
+					.addComponent(btnNewButton_1_1, GroupLayout.PREFERRED_SIZE, 133, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(btnNewButton_1, GroupLayout.DEFAULT_SIZE, 122, Short.MAX_VALUE)
 					.addContainerGap())
 		);
 		gl_deducPanel2.setVerticalGroup(
@@ -350,7 +370,8 @@ public class TablePane extends JPanel{
 				.addGroup(gl_deducPanel2.createSequentialGroup()
 					.addGroup(gl_deducPanel2.createParallelGroup(Alignment.BASELINE)
 						.addComponent(displayDeductibleTextField)
-						.addComponent(btnNewButton_1))
+						.addComponent(btnNewButton_1)
+						.addComponent(btnNewButton_1_1))
 					.addContainerGap(13, Short.MAX_VALUE))
 		);
 		deducPanel2.setLayout(gl_deducPanel2);
@@ -362,6 +383,7 @@ public class TablePane extends JPanel{
 		tableMain = new JTable();
 		tableMain.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		scrollPane.setViewportView(tableMain);
+		tableMain.getTableHeader().setReorderingAllowed(false);
 		tableMain.setModel(new DefaultTableModel(
 			new Object[][] {
 			},
@@ -506,7 +528,6 @@ public class TablePane extends JPanel{
 
 	}
 
-
 	public void calculateTotal() {
 
 		if(System.currentTimeMillis() - previousCalculateCall < 50 || tableMain.getRowCount()== 0) {
@@ -519,7 +540,7 @@ public class TablePane extends JPanel{
 
 		DefaultTableModel tableModel = (DefaultTableModel) tableMain.getModel();
 
-		double finalTotal = 0.0;
+		finalTotal = 0.0;
         Double remainingDeductible = enteredDeductible;
 
         if(remainingDeductible == null){
@@ -542,24 +563,25 @@ public class TablePane extends JPanel{
 
             for(int b = 1; b < tableMain.getColumnCount(); b++) {
             	if(tableModel.getValueAt(i, b) == null || String.valueOf((tableModel.getValueAt(i, b))).equalsIgnoreCase("")){
-            		rowInfo.add(0.0);
+            		rowInfo.add(0);
             	}else {
-            		rowInfo.add(String.valueOf(tableModel.getValueAt(i, b)));
+            		rowInfo.add(tableModel.getValueAt(i, b));
             	}
 
 
             }
+            
+            
 
             double cost = Double.parseDouble(String.valueOf(rowInfo.get(0)));
             boolean countsToDeduc = Boolean.parseBoolean(String.valueOf(rowInfo.get(1)));
             double copay = Double.parseDouble(String.valueOf(rowInfo.get(2)));
             double coinsurancePercent = Double.parseDouble(String.valueOf(rowInfo.get(3)));
             double deductibleMetAmount = Double.parseDouble(String.valueOf(rowInfo.get(4)));
-            double rowTotal = 0.0;
+            double rowTotal = 0;
 
             tableModel.setValueAt("0", i, 5);
             tableModel.setValueAt("0", i, 6);
-
 
             if(enteredDeductible != 0 && countsToDeduc){
                 if(cost >= remainingDeductible){
@@ -581,7 +603,8 @@ public class TablePane extends JPanel{
 
                 }
             }else{
-                if(coinsurancePercent != 0){
+                if(coinsurancePercent != 0.0 ){
+                	//Add a && countsToDeduc to remove the ability to have a row be affected by coins without a deductible
                     rowTotal = calculateCoinsurance(coinsurancePercent, cost);
                 }else if(copay == 0){
                     rowTotal = cost;
@@ -605,7 +628,6 @@ public class TablePane extends JPanel{
     }
 
 	private Double round(Double n){return Double.parseDouble(rt.format(n));}
-
 
 	public String getDeductibleTextFieldText() {
 		return deductibleTextField.getText();
