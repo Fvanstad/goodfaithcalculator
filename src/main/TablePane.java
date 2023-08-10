@@ -48,6 +48,7 @@ public class TablePane extends JPanel{
 	private JLabel displayDeductibleTextField;
 	public JLabel totalLabel;
 	public double finalTotal;
+	private Controller controller;
 
 	private long previousCalculateCall;
 	private JLabel insuranceCount;
@@ -55,7 +56,8 @@ public class TablePane extends JPanel{
 	private JLabel favoritesCount;
 
 	public TablePane(Controller x) {
-
+		controller = x;
+		
 		setLayout(new MigLayout("", "[900\r\npx,grow,left]", "[top][bottom][40px:n]"));
 
 		JPanel panel = new JPanel();
@@ -233,17 +235,17 @@ public class TablePane extends JPanel{
 					codeCBX.removeAllItems();
 					favoritesCBX.removeAllItems();
 					
-					if(Controller.codeDescriptions == null) {return;}
+					if(controller.codeDescriptions == null) {return;}
 
-					for (String s : Controller.codeDescriptions.keySet()) {
+					for (String s : controller.codeDescriptions.keySet()) {
 						if(insuranceCBX.getSelectedItem() != null) {
-							String cost = Controller.codes.get(s.split(" \\| ")[0]).get(insuranceCBX.getSelectedItem().toString()).get(1).toString().trim();
-							if((cost == "" || cost == "0" || cost == null) && Controller.hideCodesSetting){
+							String cost = controller.codes.get(s.split(" \\| ")[0]).get(insuranceCBX.getSelectedItem().toString()).get(1).toString().trim();
+							if((cost == "" || cost == "0" || cost == null) && controller.hideCodesSetting){
 
 								//codeCBX.addItem(s);
 
 							}else {
-								codeCBX.addItem(s + " | " + Controller.codeDescriptions.get(s));
+								codeCBX.addItem(s + " | " + controller.codeDescriptions.get(s));
 
 							}
 						}
@@ -251,15 +253,15 @@ public class TablePane extends JPanel{
 
 					codeCount.setText("(" + codeCBX.getItemCount() + ")");
 
-					for (String s : Controller.favoriteCodeDescriptions.keySet()) {
+					for (String s : controller.favoriteCodeDescriptions.keySet()) {
 						if(insuranceCBX.getSelectedItem() != null) {
-							String cost = Controller.codes.get(s.split(" \\| ")[0]).get(insuranceCBX.getSelectedItem().toString()).get(1).toString().trim();
-							if((cost == "" || cost == "0" || cost == null) && Controller.hideCodesSetting){
+							String cost = controller.codes.get(s.split(" \\| ")[0]).get(insuranceCBX.getSelectedItem().toString()).get(1).toString().trim();
+							if((cost == "" || cost == "0" || cost == null) && controller.hideCodesSetting){
 
 								//favoritesCBX.addItem(s);
 
 							}else {
-								favoritesCBX.addItem(s + " | " + Controller.codeDescriptions.get(s));
+								favoritesCBX.addItem(s + " | " + controller.favoriteCodeDescriptions.get(s));
 
 							}
 						}
@@ -353,16 +355,27 @@ public class TablePane extends JPanel{
 		});
 		btnNewButton_1_1.setToolTipText("Applies the first non-zero co-insurance value to all other rows.");
 		btnNewButton_1_1.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		
+		JButton btnNewButton_1_1_1 = new JButton("Recalculate");
+		btnNewButton_1_1_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				calculateTotal();
+			}
+		});
+		btnNewButton_1_1_1.setToolTipText("Forces a recalculate.");
+		btnNewButton_1_1_1.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		GroupLayout gl_deducPanel2 = new GroupLayout(deducPanel2);
 		gl_deducPanel2.setHorizontalGroup(
 			gl_deducPanel2.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_deducPanel2.createSequentialGroup()
 					.addContainerGap()
 					.addComponent(displayDeductibleTextField, GroupLayout.PREFERRED_SIZE, 319, GroupLayout.PREFERRED_SIZE)
-					.addGap(174)
-					.addComponent(btnNewButton_1_1, GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
+					.addGap(30)
+					.addComponent(btnNewButton_1_1_1, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(btnNewButton_1_1, GroupLayout.DEFAULT_SIZE, 138, Short.MAX_VALUE)
 					.addGap(4)
-					.addComponent(btnNewButton_1, GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
+					.addComponent(btnNewButton_1, GroupLayout.DEFAULT_SIZE, 137, Short.MAX_VALUE)
 					.addContainerGap())
 		);
 		gl_deducPanel2.setVerticalGroup(
@@ -371,7 +384,8 @@ public class TablePane extends JPanel{
 					.addGroup(gl_deducPanel2.createParallelGroup(Alignment.BASELINE)
 						.addComponent(displayDeductibleTextField)
 						.addComponent(btnNewButton_1)
-						.addComponent(btnNewButton_1_1))
+						.addComponent(btnNewButton_1_1)
+						.addComponent(btnNewButton_1_1_1))
 					.addContainerGap(13, Short.MAX_VALUE))
 		);
 		deducPanel2.setLayout(gl_deducPanel2);
@@ -472,9 +486,9 @@ public class TablePane extends JPanel{
 		codeCBX.addItem("");
 		favoritesCBX.addItem("");
 		
-		if(Controller.insuranceNames == null) {return;}
+		if(controller.insuranceNames == null) {return;}
 
-		for (String s : Controller.insuranceNames) {
+		for (String s : controller.insuranceNames) {
 			insuranceCBX.addItem(s);
 		}
 
@@ -496,7 +510,7 @@ public class TablePane extends JPanel{
 				Vector<Object> tempVector = new Vector();
 
 				tempVector.add(selectedCode);
-				tempVector.add(Controller.codes.get(selectedCode).get(selectedInsurance).get(1));
+				tempVector.add(controller.codes.get(selectedCode).get(selectedInsurance).get(1));
 				tempVector.add(false);
 				tempVector.add(0);
 				tempVector.add(0);
@@ -525,8 +539,10 @@ public class TablePane extends JPanel{
 				Vector tempVector = new Vector();
 
 				tempVector.add(selectedCode);
-				tempVector.add(Controller.codes.get(selectedCode).get(selectedInsurance).get(1));
+				tempVector.add(controller.codes.get(selectedCode).get(selectedInsurance).get(1));
 				tempVector.add(false);
+				tempVector.add(0);
+				tempVector.add(0);
 
 				model.addRow(tempVector);
 
@@ -539,8 +555,8 @@ public class TablePane extends JPanel{
 
 	public void calculateTotal() {
 
-		if(System.currentTimeMillis() - previousCalculateCall < 50 || tableMain.getRowCount()== 0) {
-			System.out.println("(Calculate Total) Function called too soon. Exiting...");
+		if(System.currentTimeMillis() - previousCalculateCall == 0 || tableMain.getRowCount()== 0) {
+			//System.out.println("(Calculate Total) Function called too soon. Exiting...");
 			previousCalculateCall = System.currentTimeMillis();
         	return;
 		}
@@ -562,7 +578,7 @@ public class TablePane extends JPanel{
                 	tableModel.setValueAt(false, i, 2);
                 }
                 if(tableModel.getValueAt(i, j) == null || String.valueOf((tableModel.getValueAt(i, j))).equalsIgnoreCase("")){
-                	tableModel.setValueAt(0, i ,j);
+                	tableModel.setValueAt(0.00, i ,j);
                 }
             }
 
@@ -570,16 +586,15 @@ public class TablePane extends JPanel{
 
             for(int b = 1; b < tableMain.getColumnCount(); b++) {
             	if(tableModel.getValueAt(i, b) == null || String.valueOf((tableModel.getValueAt(i, b))).equalsIgnoreCase("")){
-            		rowInfo.add(0);
+            		rowInfo.add(0.0);
             	}else {
             		rowInfo.add(tableModel.getValueAt(i, b));
             	}
 
 
             }
-
-
-
+            System.out.println(i + " " + rowInfo);
+            //rowInfo [0] is cost ... [4] is deductible met amt
             double cost = Double.parseDouble(String.valueOf(rowInfo.get(0)));
             boolean countsToDeduc = Boolean.parseBoolean(String.valueOf(rowInfo.get(1)));
             double copay = Double.parseDouble(String.valueOf(rowInfo.get(2)));
@@ -610,7 +625,7 @@ public class TablePane extends JPanel{
 
                 }
             }else{
-                if(coinsurancePercent != 0.0 ){
+                if(coinsurancePercent != 0.0){
                 	//Add a && countsToDeduc to remove the ability to have a row be affected by coins without a deductible
                     rowTotal = calculateCoinsurance(coinsurancePercent, cost);
                 }else if(copay == 0){

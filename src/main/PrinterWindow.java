@@ -99,6 +99,7 @@ public class PrinterWindow extends JDialog {
 	}
 
 	public PrinterWindow(Controller x) {
+
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setVisible(true);
 		setTitle("Print Calculation");
@@ -566,7 +567,7 @@ public class PrinterWindow extends JDialog {
 
 	public void printTemplate() throws Exception {
 
-		if(tablePane.tableMain.getRowCount() > 0 && fileTree.getLastSelectedPathComponent() != null) {
+		if(fileTree.getLastSelectedPathComponent() != null) {
 
 			createPatientClass();
 
@@ -635,48 +636,54 @@ public class PrinterWindow extends JDialog {
 			TextSelection tableSelection = null;
 
 			try {
-				tableSelection = document.findString("{{table}}", true, true);
+				if(tablePane.tableMain.getRowCount() > 0) {
+					tableSelection = document.findString("{{table}}", true, true);
+
+					Section section = document.getSections().get(0);
+					section.getTables().get(0);
+					Table costTable = section.addTable();
+					costTable.applyStyle("Plain Table 4");
+
+					TextRange range = tableSelection.getAsOneRange();
+					Paragraph paragraph = range.getOwnerParagraph();
+					Body body = paragraph.ownerTextBody();
+					int index = body.getChildObjects().indexOf(paragraph);
+
+					costTable.resetCells(tablePane.tableMain.getRowCount() + 1, 4);
+					body.getChildObjects().remove(paragraph);
+					body.getChildObjects().insert(index, costTable);
+
+					costTable.get(0, 0).addParagraph().setText("Service Requested");
+					costTable.get(0, 1).addParagraph().setText("Service Description");
+			        costTable.get(0, 2).addParagraph().setText("Full Undiscounted Fee");
+			        costTable.get(0, 3).addParagraph().setText("Contractual Discounted Fee");
+
+			        for(int i = 0; i < rowData.size(); i++) {
+			        	String[] tempRowData = rowData.get(i).split("\\|");
+
+						costTable.get(i + 1, 0).addParagraph().setText(tempRowData[0]);
+						costTable.get(i + 1, 1).addParagraph().setText(tempRowData[1]);
+						costTable.get(i + 1, 2).addParagraph().setText(tempRowData[2]);
+						costTable.get(i + 1, 3).addParagraph().setText(tempRowData[tempRowData.length-1]);
+					}
+					costTable.addRow();
+					costTable.get(costTable.getRows().getCount() - 1, 3).addParagraph().setText("Estimated Total Due: $" + String.format("%.2f", tablePane.finalTotal));
+
+			    	}
+				
+				JFileChooser fileChooser = new JFileChooser();
+		    	fileChooser.setDialogTitle("Save As");
+		    	int returnResult = fileChooser.showSaveDialog(null);
+		    	if(returnResult == JFileChooser.APPROVE_OPTION) {
+		    		File saveFile = fileChooser.getSelectedFile();
+		    		document.saveToFile(saveFile + ".pdf");
+				
+				}
+	    	
 			} catch (Exception e) {
-				// TODO: handle exception
+				e.printStackTrace();
 			}
-
-			Section section = document.getSections().get(0);
-			section.getTables().get(0);
-			Table costTable = section.addTable();
-			costTable.applyStyle("Plain Table 4");
-
-			TextRange range = tableSelection.getAsOneRange();
-			Paragraph paragraph = range.getOwnerParagraph();
-			Body body = paragraph.ownerTextBody();
-			int index = body.getChildObjects().indexOf(paragraph);
-
-			costTable.resetCells(tablePane.tableMain.getRowCount() + 1, 4);
-			body.getChildObjects().remove(paragraph);
-			body.getChildObjects().insert(index, costTable);
-
-			costTable.get(0, 0).addParagraph().setText("Service Requested");
-			costTable.get(0, 1).addParagraph().setText("Service Description");
-	        costTable.get(0, 2).addParagraph().setText("Full Undiscounted Fee");
-	        costTable.get(0, 3).addParagraph().setText("Contractual Discounted Fee");
-
-	        for(int i = 0; i < rowData.size(); i++) {
-	        	String[] tempRowData = rowData.get(i).split("\\|");
-
-				costTable.get(i + 1, 0).addParagraph().setText(tempRowData[0]);
-				costTable.get(i + 1, 1).addParagraph().setText(tempRowData[1]);
-				costTable.get(i + 1, 2).addParagraph().setText(tempRowData[2]);
-				costTable.get(i + 1, 3).addParagraph().setText(tempRowData[tempRowData.length-1]);
-			}
-			costTable.addRow();
-			costTable.get(costTable.getRows().getCount() - 1, 0).addParagraph().setText("Estimated Total Due: $" + String.format("%.2f", tablePane.finalTotal));
-
-			JFileChooser fileChooser = new JFileChooser();
-	    	fileChooser.setDialogTitle("Save As");
-	    	int returnResult = fileChooser.showSaveDialog(null);
-	    	if(returnResult == JFileChooser.APPROVE_OPTION) {
-	    		File saveFile = fileChooser.getSelectedFile();
-	    		document.saveToFile(saveFile + ".pdf");
-	    	}
+			
 
 
 		}

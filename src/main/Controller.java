@@ -158,9 +158,11 @@ public class Controller {
             }
 
             codeDescriptions.put(currentCode,currentDescription);
+            
+       
 
             if(favoriteCodeDescriptions.size() < favoritesLimit) {
-            	favoriteCodeDescriptions.put(currentCode + " | " + currentDescription, "");
+            	favoriteCodeDescriptions.put(currentCode, currentDescription);
             }
 
         }
@@ -233,10 +235,6 @@ public class Controller {
 
 
 				String tempAttorney = address + "|" + input.get(phoneIndex); //+ "|" + input.get(faxIndex);
-
-				if(input.get(nameIndex).indexOf("ATTY -") != -1) {
-					input.set(nameIndex, input.get(nameIndex).replaceFirst("ATTY -", ""));
-				}
 
 				contactsList.put(input.get(nameIndex).trim(), tempAttorney.trim());
 
