@@ -483,47 +483,56 @@ public class TablePane extends JPanel{
 	}
 
 	public void addRowNormal() {
+		
+		if(codeCBX.getSelectedItem() != null) {
+			
+			String selectedCode = codeCBX.getSelectedItem().toString().split(" \\| ")[0];
+			String selectedInsurance = insuranceCBX.getSelectedItem().toString();
 
-		String selectedCode = codeCBX.getSelectedItem().toString().split(" \\| ")[0];
-		String selectedInsurance = insuranceCBX.getSelectedItem().toString();
+			if(selectedCode != "" && selectedInsurance != "") {
 
-		if(selectedCode != "" && selectedInsurance != "") {
+				DefaultTableModel model = (DefaultTableModel) tableMain.getModel();
 
-			DefaultTableModel model = (DefaultTableModel) tableMain.getModel();
+				Vector<Object> tempVector = new Vector();
 
-			Vector<Object> tempVector = new Vector();
+				tempVector.add(selectedCode);
+				tempVector.add(Controller.codes.get(selectedCode).get(selectedInsurance).get(1));
+				tempVector.add(false);
+				tempVector.add(0);
+				tempVector.add(0);
 
-			tempVector.add(selectedCode);
-			tempVector.add(Controller.codes.get(selectedCode).get(selectedInsurance).get(1));
-			tempVector.add(false);
-			tempVector.add(0);
-			tempVector.add(0);
+				model.addRow(tempVector);
 
-			model.addRow(tempVector);
+				calculateTotal();
 
-			calculateTotal();
-
+			}
+			
 		}
+
+		
 	}
 
 	public void addRowFavorite() {
+		
+		if(favoritesCBX.getSelectedItem() != null) {
+			
+			String selectedCode = favoritesCBX.getSelectedItem().toString().split(" \\| ")[0];
+			String selectedInsurance = insuranceCBX.getSelectedItem().toString();
 
-		String selectedCode = favoritesCBX.getSelectedItem().toString().split(" \\| ")[0];
-		String selectedInsurance = insuranceCBX.getSelectedItem().toString();
+			if(selectedCode != "" && selectedInsurance != "") {
+				DefaultTableModel model = (DefaultTableModel) tableMain.getModel();
 
-		if(selectedCode != "" && selectedInsurance != "") {
-			DefaultTableModel model = (DefaultTableModel) tableMain.getModel();
+				Vector tempVector = new Vector();
 
-			Vector tempVector = new Vector();
+				tempVector.add(selectedCode);
+				tempVector.add(Controller.codes.get(selectedCode).get(selectedInsurance).get(1));
+				tempVector.add(false);
 
-			tempVector.add(selectedCode);
-			tempVector.add(Controller.codes.get(selectedCode).get(selectedInsurance).get(1));
-			tempVector.add(false);
+				model.addRow(tempVector);
 
-			model.addRow(tempVector);
+				calculateTotal();
 
-			calculateTotal();
-
+			}
 		}
 
 	}
