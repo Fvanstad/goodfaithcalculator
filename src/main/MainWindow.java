@@ -9,7 +9,6 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JCheckBoxMenuItem;
@@ -28,11 +27,8 @@ public class MainWindow extends JFrame {
 
 	private JPanel mainPane;
 	private JTabbedPane tabbedPane;
+	public Controller controller = null;
 
-
-	/**
-	 * Launch the application.
-	 */
 	public static void main(String[] args) {
 
 	try {
@@ -60,17 +56,20 @@ public class MainWindow extends JFrame {
 		});
 	}
 
-	/**
-	 * Create the frame.
-	 */
-	static Controller controller = new Controller();
 
 	public MainWindow() {
+		
+		try {
+			controller = new Controller();
+		} catch (Exception e) {
+			controller = null;
+		}
+		
 		setTitle("Good Faith Calculator");
 
 		setResizable(false);
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		setBounds(100, 100, 858, 804);
+		setBounds(100, 100, 828, 804);
 
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.setBackground(SystemColor.menu);
@@ -159,11 +158,15 @@ public class MainWindow extends JFrame {
 		GroupLayout gl_mainPane = new GroupLayout(mainPane);
 		gl_mainPane.setHorizontalGroup(
 			gl_mainPane.createParallelGroup(Alignment.LEADING)
-				.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 834, Short.MAX_VALUE)
+				.addGroup(gl_mainPane.createSequentialGroup()
+					.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 809, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(80, Short.MAX_VALUE))
 		);
 		gl_mainPane.setVerticalGroup(
-			gl_mainPane.createParallelGroup(Alignment.TRAILING)
-				.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 729, Short.MAX_VALUE)
+			gl_mainPane.createParallelGroup(Alignment.LEADING)
+				.addGroup(Alignment.TRAILING, gl_mainPane.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 716, Short.MAX_VALUE))
 		);
 
 		mainPane.setLayout(gl_mainPane);
@@ -172,8 +175,6 @@ public class MainWindow extends JFrame {
 
 		addTab();
 	}
-
-
 
 	public void addTab() {
 

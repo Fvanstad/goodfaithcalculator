@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.TreeMap;
@@ -15,27 +16,29 @@ import java.util.TreeMap;
 import javax.swing.JOptionPane;
 
 public class Controller {
-	
+
 	Properties properties = new Properties();
 	FileInputStream inputStream;
 
-	private static Scanner scanner;
-    private static String codeFileLocation;
-    private static File feeDBFile;
+	private static String codeFileLocation = "";
+	public static String templatesFolderLocation = "";
+	private static String contactsFileLocation = "";
 
-    public static Scanner templateScanner;
-    public static String templatesFolderLocation;
+	public static Scanner templateScanner = null;
 
-    public static ArrayList<String> insuranceNames;
-	public static HashMap<String, HashMap<String, ArrayList>> codes;
-	public static TreeMap<String, String> codeDescriptions;
-	public static TreeMap<String, String> favoriteCodeDescriptions;
-	public static HashMap<String, ArrayList> insuranceCompaniesMap;
+    public static ArrayList<String> insuranceNames = null;
+    public static TreeMap<String, String> contactsList = null;
+	public static HashMap<String, HashMap<String, ArrayList>> codes = null;
+	public static TreeMap<String, String> codeDescriptions = null;
+	public static TreeMap<String, String> favoriteCodeDescriptions = null;
+	public static HashMap<String, ArrayList> insuranceCompaniesMap = null;
 	public static int favoritesLimit = 40;
 
 	public String userName;
 	public String userTitle;
 	public locationOfCare locationOfCare = new locationOfCare();
+	
+	public static boolean hideCodesSetting = false;
 
 	public class locationOfCare {
 
@@ -50,34 +53,35 @@ public class Controller {
 
 	}
 
-	public static boolean hideCodesSetting = false;
-
 	public Controller() {
 		readConfigFile();
 		readCodeFile();
-
+		readContactsFile();
 	}
 
 	public void readConfigFile() {
-		
+
 		try {
 			inputStream = new FileInputStream("config.properties");
 			properties.load(inputStream);
 			codeFileLocation = properties.getProperty("codeFileLocation");
 			templatesFolderLocation = properties.getProperty("templatesFolderLocation");
-			
+			contactsFileLocation = properties.getProperty("contactsFileLocation");
 			if(properties.containsKey(System.getProperty("user.name"))) {
 				userName = properties.getProperty(System.getProperty("user.name")).split("\\|")[0];
-				userTitle = properties.getProperty(System.getProperty("user.name")).split("\\|")[1];	
-			}	
+				userTitle = properties.getProperty(System.getProperty("user.name")).split("\\|")[1];
+			}
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, "There was an error trying to find the config file.");
 			return;
 		}
-		
+
 	}
-	
-	public static void readCodeFile() {
+
+	public void readCodeFile() {
+
+		Scanner scanner;
+	    File feeDBFile;
 
 		insuranceNames = new ArrayList<>();
 
@@ -163,6 +167,89 @@ public class Controller {
 
         Collections.sort(insuranceNames);
 
+        scanner.close();
+	}
+
+	public void readContactsFile() {
+		
+		File contactsFile;
+		Scanner contactScanner;
+		
+		try {
+			contactsFile = new File(contactsFileLocation);
+			contactScanner = new Scanner(contactsFile);
+			contactsList = new TreeMap();
+
+			int nameIndex = -1;
+			int addressIndex = -1;
+			int csIndex = -1;
+			int zipIndex = -1;
+			int phoneIndex = -1;
+			//int faxIndex;
+
+			while(contactScanner.hasNext()) {
+				List<String> input = Arrays.asList(contactScanner.nextLine().split("\\|"));
+				if((input.contains("Name") && nameIndex == -1)) {
+					//Find the index(s) of needed data
+					nameIndex = input.indexOf("Name");
+					addressIndex = input.indexOf("Address");
+					csIndex = input.indexOf("City/State");
+					zipIndex = input.indexOf("Zip");
+					phoneIndex = input.indexOf("Phone");
+					//faxIndex = input.indexOf("Fax");
+					break;
+				}
+			}
+
+			while(contactScanner.hasNext()) {
+
+				List<String> input = Arrays.asList(Arrays.copyOf(contactScanner.nextLine().split("\\|"), phoneIndex + 1));
+
+				Scanner tempScanner = contactScanner;
+				List<String> tempInput = null;
+
+				if(tempScanner.hasNext()) {
+					tempInput = Arrays.asList(Arrays.copyOf(tempScanner.nextLine().split("\\|"), phoneIndex + 1));
+					if(input.get(phoneIndex) == null) {
+						input.set(phoneIndex, tempInput.get(phoneIndex));
+					}
+				}
+
+				if(input.get(nameIndex) == "" || input.contains(null)) {
+					continue;
+				}
+
+				String address;
+
+				if(tempInput != null && tempInput.get(nameIndex) == "" && tempInput.get(addressIndex) != "") {
+					//If a suite # or additional address information is on the next line
+					address = input.get(addressIndex) + ", " + tempInput.get(addressIndex) + ", " + input.get(csIndex) + input.get(csIndex+1) + ", " + input.get(zipIndex);
+				}else if(input.get(addressIndex) == "") {
+					address = "";
+				}else {
+					address = input.get(addressIndex)  + ", " + input.get(csIndex) + input.get(csIndex+1) + ", " + input.get(zipIndex);
+				}
+
+
+
+				String tempAttorney = address + "|" + input.get(phoneIndex); //+ "|" + input.get(faxIndex);
+
+				if(input.get(nameIndex).indexOf("ATTY -") != -1) {
+					input.set(nameIndex, input.get(nameIndex).replaceFirst("ATTY -", ""));
+				}
+
+				contactsList.put(input.get(nameIndex).trim(), tempAttorney.trim());
+
+			}
+			
+			contactScanner.close();
+
+		} catch (FileNotFoundException e) {
+			JOptionPane.showMessageDialog(null, "There was an error trying to load the contacts file.");
+			return;
+		}
+
+
 
 	}
 
@@ -179,35 +266,34 @@ public class Controller {
 	}
 
 	public void saveUserInfo(String x, String y) {
-		
+
 		FileOutputStream outputStream;
-		
+
 		try {
 			outputStream = new FileOutputStream("config.properties");
-			
+
 			if(!properties.containsKey(System.getProperty("user.name"))) {
-				
+
 				properties.put(System.getProperty("user.name"), x + "|" + y);
 				properties.store(outputStream, null);
 				System.out.println("(saveUserInfo) saving new user");
-				
+
 			}else {
-				
+
 				properties.setProperty(System.getProperty("user.name"), x + "|" + y);
 				properties.store(outputStream, null);
 				System.out.println("(saveUserInfo) saving current user");
-				
+
 			}
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, "There was an error trying to save to the config file.");
-			e.printStackTrace();
-			return;
+			//JOptionPane.showMessageDialog(null, "There was an error trying to save to the config file.");
+			
 		}
-		
-		
-		
-		
+
+
+
+
 	}
-		
-	
+
+
 	}

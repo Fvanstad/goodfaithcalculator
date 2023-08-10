@@ -46,7 +46,6 @@ public class TablePane extends JPanel{
 	public double enteredDeductible;
 	private JTextField deductibleTextField;
 	private JLabel displayDeductibleTextField;
-	private Controller controller;
 	public JLabel totalLabel;
 	public double finalTotal;
 
@@ -57,9 +56,7 @@ public class TablePane extends JPanel{
 
 	public TablePane(Controller x) {
 
-		this.controller = x;
-
-		setLayout(new MigLayout("", "[900\r\npx,grow]", "[top][grow,bottom][40px:n]"));
+		setLayout(new MigLayout("", "[900\r\npx,grow,left]", "[top][bottom][40px:n]"));
 
 		JPanel panel = new JPanel();
 		panel.setBackground(new Color(240, 240, 240));
@@ -104,7 +101,7 @@ public class TablePane extends JPanel{
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(codeCount, GroupLayout.PREFERRED_SIZE, 43, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(btnNewButton, GroupLayout.DEFAULT_SIZE, 124, Short.MAX_VALUE)
+					.addComponent(btnNewButton, GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
 					.addContainerGap())
 		);
 		gl_codePanel.setVerticalGroup(
@@ -152,11 +149,11 @@ public class TablePane extends JPanel{
 					.addContainerGap()
 					.addComponent(lblNewLabel_1_1_2, GroupLayout.PREFERRED_SIZE, 90, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(favoritesCBX, GroupLayout.PREFERRED_SIZE, 487, GroupLayout.PREFERRED_SIZE)
+					.addComponent(favoritesCBX, 0, 487, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(favoritesCount, GroupLayout.PREFERRED_SIZE, 43, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(btnAddFavorite, GroupLayout.DEFAULT_SIZE, 124, Short.MAX_VALUE)
+					.addComponent(btnAddFavorite, GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
 					.addContainerGap())
 		);
 		gl_favoritesPanel.setVerticalGroup(
@@ -206,9 +203,9 @@ public class TablePane extends JPanel{
 				.addGroup(gl_deducPanel.createSequentialGroup()
 					.addContainerGap()
 					.addComponent(lblNewLabel_1_1_3)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(deductibleTextField, GroupLayout.PREFERRED_SIZE, 209, GroupLayout.PREFERRED_SIZE)
-					.addGap(464))
+					.addGap(12)
+					.addComponent(deductibleTextField, GroupLayout.PREFERRED_SIZE, 214, GroupLayout.PREFERRED_SIZE)
+					.addGap(475))
 		);
 		gl_deducPanel.setVerticalGroup(
 			gl_deducPanel.createParallelGroup(Alignment.LEADING)
@@ -235,6 +232,8 @@ public class TablePane extends JPanel{
 
 					codeCBX.removeAllItems();
 					favoritesCBX.removeAllItems();
+					
+					if(Controller.codeDescriptions == null) {return;}
 
 					for (String s : Controller.codeDescriptions.keySet()) {
 						if(insuranceCBX.getSelectedItem() != null) {
@@ -292,7 +291,7 @@ public class TablePane extends JPanel{
 					.addComponent(insuranceCBX, GroupLayout.PREFERRED_SIZE, 487, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(insuranceCount, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(137, Short.MAX_VALUE))
+					.addContainerGap(153, Short.MAX_VALUE))
 		);
 		gl_insurancePanel.setVerticalGroup(
 			gl_insurancePanel.createParallelGroup(Alignment.LEADING)
@@ -337,9 +336,10 @@ public class TablePane extends JPanel{
 			}
 		});
 		btnNewButton_1.setFont(new Font("Tahoma", Font.PLAIN, 11));
-		
+
 		JButton btnNewButton_1_1 = new JButton("Share Co-Insurance\r\n");
 		btnNewButton_1_1.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				double coInsuranceAmnt = 0.0;
 				for(int i = 0; i < tableMain.getRowCount(); i++) {
@@ -360,9 +360,9 @@ public class TablePane extends JPanel{
 					.addContainerGap()
 					.addComponent(displayDeductibleTextField, GroupLayout.PREFERRED_SIZE, 319, GroupLayout.PREFERRED_SIZE)
 					.addGap(174)
-					.addComponent(btnNewButton_1_1, GroupLayout.PREFERRED_SIZE, 133, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(btnNewButton_1, GroupLayout.DEFAULT_SIZE, 122, Short.MAX_VALUE)
+					.addComponent(btnNewButton_1_1, GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
+					.addGap(4)
+					.addComponent(btnNewButton_1, GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
 					.addContainerGap())
 		);
 		gl_deducPanel2.setVerticalGroup(
@@ -422,8 +422,6 @@ public class TablePane extends JPanel{
 		tableMain.getColumnModel().getColumn(6).setPreferredWidth(114);
 		tableMain.getColumnModel().getColumn(7).setResizable(false);
 
-		DefaultTableModel model = (DefaultTableModel) tableMain.getModel();
-
 		//ADD LISTENER TO CALL CALCULATE TOTAL AUTO...
 
 		tableMain.getModel().addTableModelListener(new TableModelListener() {
@@ -473,6 +471,8 @@ public class TablePane extends JPanel{
 		insuranceCBX.addItem("");
 		codeCBX.addItem("");
 		favoritesCBX.addItem("");
+		
+		if(Controller.insuranceNames == null) {return;}
 
 		for (String s : Controller.insuranceNames) {
 			insuranceCBX.addItem(s);
@@ -491,7 +491,7 @@ public class TablePane extends JPanel{
 
 			DefaultTableModel model = (DefaultTableModel) tableMain.getModel();
 
-			Vector tempVector = new Vector();
+			Vector<Object> tempVector = new Vector();
 
 			tempVector.add(selectedCode);
 			tempVector.add(Controller.codes.get(selectedCode).get(selectedInsurance).get(1));
@@ -547,8 +547,6 @@ public class TablePane extends JPanel{
             remainingDeductible = 0.0;
         }
 
-
-
         for(int i = 0; i < tableModel.getRowCount(); i++){
             for(int j = 0; j < tableModel.getColumnCount(); j++){
                 if(tableModel.getValueAt(i, 2) == null){
@@ -570,8 +568,8 @@ public class TablePane extends JPanel{
 
 
             }
-            
-            
+
+
 
             double cost = Double.parseDouble(String.valueOf(rowInfo.get(0)));
             boolean countsToDeduc = Boolean.parseBoolean(String.valueOf(rowInfo.get(1)));
