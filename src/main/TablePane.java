@@ -54,6 +54,9 @@ public class TablePane extends JPanel{
 	private JLabel insuranceCount;
 	private JLabel codeCount;
 	private JLabel favoritesCount;
+	private TableModel snapShotModel;
+	
+	private boolean debugMode = false;
 
 	public TablePane(Controller x) {
 		controller = x;
@@ -190,6 +193,8 @@ public class TablePane extends JPanel{
 				}
 				catch(Exception x){
 					displayDeductibleTextField.setForeground(Color.red);
+					displayDeductibleTextField.setText("0.00");
+					setDisplayDeductibleTextFieldText("Deductible: $ 0.00");
 				}
 				calculateTotal();
 			}
@@ -343,12 +348,17 @@ public class TablePane extends JPanel{
 		btnNewButton_1_1.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				double coInsuranceAmnt = 0.0;
+				String coInsuranceAmnt = null;
 				for(int i = 0; i < tableMain.getRowCount(); i++) {
-					if(tableMain.getValueAt(i, 4) != null &&(Double.parseDouble(String.valueOf(tableMain.getValueAt(i, 4)))) != 0.0 && coInsuranceAmnt == 0.0) {
-						coInsuranceAmnt = Double.parseDouble(String.valueOf(tableMain.getValueAt(i, 4)));
+					
+					if(coInsuranceAmnt == null && !tableMain.getValueAt(i, 4).toString().trim().matches("0")) {
+						//Find the first non-zero value
+						coInsuranceAmnt = tableMain.getValueAt(i, 4).toString().trim();
+						i = 0;
 					}
+					
 					tableMain.setValueAt(coInsuranceAmnt, i , 4);
+					
 				}
 				calculateTotal();
 			}
@@ -442,33 +452,37 @@ public class TablePane extends JPanel{
 
 			@Override
 			public void tableChanged(TableModelEvent e) {
-				calculateTotal();
-
-			}
-		});
-
-
-		/*table.addKeyListener(new KeyListener().keyPressed(KeyEvent e) {
-
-
-
-			@Override
-			public void keyPressed(KeyEvent e) {
-				int focusRow = table.getSelectedRow();
-				int focusColumn = table.getSelectedColumn();
-
-				if(table.getValueAt(focusRow, focusColumn).toString().matches("0")) {
-
-					table.setValueAt("", focusRow, focusColumn);
-					System.out.println("(Table FL) focus location: " + focusRow + " | " + focusColumn);
-
+				
+				if(e.getType() == e.INSERT) {
+					if(debugMode) {System.out.println("Inserted Row, Updating...");}
+					calculateTotal();
 				}
-
-
+				
+				if(e.getType() == TableModelEvent.UPDATE) {
+					
+					if(System.currentTimeMillis() - previousCalculateCall < 5 || tableMain.getRowCount() == 0) {
+						if(debugMode) {System.out.println("Refusing function call");} 
+						previousCalculateCall = System.currentTimeMillis();
+			        	return;
+					}
+					previousCalculateCall = System.currentTimeMillis();
+					if(debugMode) {System.out.println("Changed Row, Updating..." + e.getColumn());} 
+					calculateTotal();
+				}
+				
+				if(e.getType() == e.DELETE) {
+					if(debugMode) {System.out.println("Deleted Row, Updating...");} 
+					calculateTotal();
+				}
+				
+				
+				if(snapShotModel != null && tableMain.getModel() != snapShotModel) {
+					
+					calculateTotal();
+				}
+				snapShotModel = tableMain.getModel();
 			}
 		});
-
-		*/
 
 		JPanel panel_1 = new JPanel();
 		add(panel_1, "cell 0 2,grow");
@@ -555,30 +569,18 @@ public class TablePane extends JPanel{
 
 	public void calculateTotal() {
 
-		if(System.currentTimeMillis() - previousCalculateCall == 0 || tableMain.getRowCount()== 0) {
-			//System.out.println("(Calculate Total) Function called too soon. Exiting...");
-			previousCalculateCall = System.currentTimeMillis();
-        	return;
-		}
-
 		previousCalculateCall = System.currentTimeMillis();
 
 		DefaultTableModel tableModel = (DefaultTableModel) tableMain.getModel();
 
 		finalTotal = 0.0;
         Double remainingDeductible = enteredDeductible;
-
-        if(remainingDeductible == null){
-            remainingDeductible = 0.0;
-        }
-
+        
+        //This for loop makes sure any empty cells have some value so they can always be converted to a Double.
         for(int i = 0; i < tableModel.getRowCount(); i++){
             for(int j = 0; j < tableModel.getColumnCount(); j++){
-                if(tableModel.getValueAt(i, 2) == null){
-                	tableModel.setValueAt(false, i, 2);
-                }
                 if(tableModel.getValueAt(i, j) == null || String.valueOf((tableModel.getValueAt(i, j))).equalsIgnoreCase("")){
-                	tableModel.setValueAt(0.00, i ,j);
+                	tableModel.setValueAt(0, i ,j);
                 }
             }
 
@@ -586,14 +588,15 @@ public class TablePane extends JPanel{
 
             for(int b = 1; b < tableMain.getColumnCount(); b++) {
             	if(tableModel.getValueAt(i, b) == null || String.valueOf((tableModel.getValueAt(i, b))).equalsIgnoreCase("")){
-            		rowInfo.add(0.0);
+            		rowInfo.add(0);
             	}else {
             		rowInfo.add(tableModel.getValueAt(i, b));
             	}
 
 
             }
-            System.out.println(i + " " + rowInfo);
+            
+           
             //rowInfo [0] is cost ... [4] is deductible met amt
             double cost = Double.parseDouble(String.valueOf(rowInfo.get(0)));
             boolean countsToDeduc = Boolean.parseBoolean(String.valueOf(rowInfo.get(1)));
@@ -605,18 +608,18 @@ public class TablePane extends JPanel{
             tableModel.setValueAt("0", i, 5);
             tableModel.setValueAt("0", i, 6);
 
-            if(enteredDeductible != 0 && countsToDeduc){
+            if(enteredDeductible != 0 && countsToDeduc && copay == 0){
                 if(cost >= remainingDeductible){
                     deductibleMetAmount = Math.abs(remainingDeductible - cost);
                     tableModel.setValueAt(String.format("%.2f", remainingDeductible), i, 5);
-                    remainingDeductible = 0.0;
+                    remainingDeductible = 0.00;
                 }if(cost < remainingDeductible){
                     remainingDeductible = remainingDeductible - cost;
                     rowTotal = cost;
                     tableModel.setValueAt(round(cost), i, 5);
                     tableModel.setValueAt(String.format("%.2f", remainingDeductible), i, 6);
-                }if(remainingDeductible == 0.0) {
-                    if (coinsurancePercent != 0.0) {
+                }if(remainingDeductible == 0.00) {
+                    if (coinsurancePercent != 0.00) {
                         rowTotal = calculateCoinsurance(coinsurancePercent, deductibleMetAmount);
                     } else {
                         rowTotal = deductibleMetAmount;
@@ -625,7 +628,7 @@ public class TablePane extends JPanel{
 
                 }
             }else{
-                if(coinsurancePercent != 0.0){
+                if(coinsurancePercent != 0.00){
                 	//Add a && countsToDeduc to remove the ability to have a row be affected by coins without a deductible
                     rowTotal = calculateCoinsurance(coinsurancePercent, cost);
                 }else if(copay == 0){
@@ -633,7 +636,7 @@ public class TablePane extends JPanel{
                 }
             }
 
-            if(copay != 0.0){rowTotal = copay;}
+            if(copay != 0.00){rowTotal = copay;}
             rowTotal = round(rowTotal);
             tableModel.setValueAt(String.format("%.2f", rowTotal),i,7);
             finalTotal += rowTotal;
@@ -668,5 +671,8 @@ public class TablePane extends JPanel{
 	}
 	public void setTableModel(TableModel model) {
 		tableMain.setModel(model);
+	}
+	public JTextField getDeductibleTextField() {
+		return deductibleTextField;
 	}
 }

@@ -27,7 +27,7 @@ public class MainWindow extends JFrame {
 
 	private JPanel mainPane;
 	private JTabbedPane tabbedPane;
-	public Controller controller = null;
+	public Controller controller;
 
 	public static void main(String[] args) {
 
@@ -59,11 +59,7 @@ public class MainWindow extends JFrame {
 
 	public MainWindow() {
 		
-		try {
-			controller = new Controller();
-		} catch (Exception e) {
-			controller = null;
-		}
+		controller = new Controller();
 		
 		setTitle("Good Faith Calculator");
 
@@ -159,14 +155,14 @@ public class MainWindow extends JFrame {
 		gl_mainPane.setHorizontalGroup(
 			gl_mainPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_mainPane.createSequentialGroup()
-					.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 809, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(80, Short.MAX_VALUE))
+					.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 799, Short.MAX_VALUE)
+					.addGap(3))
 		);
 		gl_mainPane.setVerticalGroup(
-			gl_mainPane.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_mainPane.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 716, Short.MAX_VALUE))
+			gl_mainPane.createParallelGroup(Alignment.TRAILING)
+				.addGroup(Alignment.LEADING, gl_mainPane.createSequentialGroup()
+					.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 716, Short.MAX_VALUE)
+					.addContainerGap())
 		);
 
 		mainPane.setLayout(gl_mainPane);

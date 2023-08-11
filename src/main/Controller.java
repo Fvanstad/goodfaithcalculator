@@ -72,7 +72,7 @@ public class Controller {
 				userTitle = properties.getProperty(System.getProperty("user.name")).split("\\|")[1];
 			}
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, "There was an error trying to find the config file.");
+			//JOptionPane.showMessageDialog(null, "There was an error trying to find the config file.");
 			return;
 		}
 
@@ -243,7 +243,7 @@ public class Controller {
 			contactScanner.close();
 
 		} catch (FileNotFoundException e) {
-			JOptionPane.showMessageDialog(null, "There was an error trying to load the contacts file.");
+			//JOptionPane.showMessageDialog(null, "There was an error trying to load the contacts file.");
 			return;
 		}
 
