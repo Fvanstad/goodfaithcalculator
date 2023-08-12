@@ -181,10 +181,6 @@ public class TablePane extends JPanel{
 		JPanel deducPanel = new JPanel();
 		deducPanel.setFocusable(false);
 
-		JLabel lblNewLabel_1_1_3 = new JLabel("Deductible: $");
-		lblNewLabel_1_1_3.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblNewLabel_1_1_3.setFont(new Font("Tahoma", Font.PLAIN, 14));
-
 		deductibleTextField = new JTextField();
 		deductibleTextField.addKeyListener(new KeyAdapter() {
 			@Override
@@ -209,21 +205,25 @@ public class TablePane extends JPanel{
 		deductibleTextField.setAlignmentX(Component.RIGHT_ALIGNMENT);
 		deductibleTextField.setName("");
 		deductibleTextField.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+		
+		JLabel lblNewLabel_1_1_2_1 = new JLabel("Deductible: $  ");
+		lblNewLabel_1_1_2_1.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblNewLabel_1_1_2_1.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		GroupLayout gl_deducPanel = new GroupLayout(deducPanel);
 		gl_deducPanel.setHorizontalGroup(
 			gl_deducPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_deducPanel.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(lblNewLabel_1_1_3)
-					.addGap(12)
+					.addComponent(lblNewLabel_1_1_2_1, GroupLayout.PREFERRED_SIZE, 90, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(deductibleTextField, GroupLayout.PREFERRED_SIZE, 214, GroupLayout.PREFERRED_SIZE)
-					.addGap(475))
+					.addGap(474))
 		);
 		gl_deducPanel.setVerticalGroup(
 			gl_deducPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_deducPanel.createSequentialGroup()
 					.addGroup(gl_deducPanel.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblNewLabel_1_1_3)
+						.addComponent(lblNewLabel_1_1_2_1, GroupLayout.PREFERRED_SIZE, 17, GroupLayout.PREFERRED_SIZE)
 						.addComponent(deductibleTextField, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE))
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
@@ -425,23 +425,23 @@ public class TablePane extends JPanel{
 				.addGroup(gl_deducPanel2.createSequentialGroup()
 					.addContainerGap()
 					.addComponent(displayDeductibleTextField, GroupLayout.PREFERRED_SIZE, 319, GroupLayout.PREFERRED_SIZE)
-					.addGap(30)
+					.addPreferredGap(ComponentPlacement.RELATED, 21, Short.MAX_VALUE)
 					.addComponent(btnNewButton_1_1_1, GroupLayout.PREFERRED_SIZE, 140, GroupLayout.PREFERRED_SIZE)
-					.addGap(4)
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(btnNewButton_1_1, GroupLayout.PREFERRED_SIZE, 140, GroupLayout.PREFERRED_SIZE)
-					.addGap(4)
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(btnNewButton_1, GroupLayout.PREFERRED_SIZE, 140, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(12, Short.MAX_VALUE))
+					.addContainerGap())
 		);
 		gl_deducPanel2.setVerticalGroup(
 			gl_deducPanel2.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_deducPanel2.createSequentialGroup()
 					.addGroup(gl_deducPanel2.createParallelGroup(Alignment.BASELINE)
 						.addComponent(displayDeductibleTextField)
+						.addComponent(btnNewButton_1)
 						.addComponent(btnNewButton_1_1)
-						.addComponent(btnNewButton_1_1_1)
-						.addComponent(btnNewButton_1))
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+						.addComponent(btnNewButton_1_1_1))
+					.addContainerGap(13, Short.MAX_VALUE))
 		);
 		deducPanel2.setLayout(gl_deducPanel2);
 

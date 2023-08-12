@@ -37,10 +37,14 @@ import com.spire.doc.documents.Paragraph;
 import com.spire.doc.documents.TextSelection;
 import com.spire.doc.fields.TextRange;
 import javax.swing.JProgressBar;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class PrinterWindow extends JDialog {
 
-	private static Controller controller = new Controller();
+	private static Controller controller;
 	public static TablePane tablePane;
 
 	protected Patient patient;
@@ -120,9 +124,9 @@ public class PrinterWindow extends JDialog {
 			buttonPane = new JPanel();
 			{
 				printButton = new JButton("Print");
-				printButton.addActionListener(new ActionListener() {
+				printButton.addMouseListener(new MouseAdapter() {
 					@Override
-					public void actionPerformed(ActionEvent e) {
+					public void mousePressed(MouseEvent e) {
 						try {
 							progressBar.setValue(5);
 							printTemplate();
@@ -132,6 +136,8 @@ public class PrinterWindow extends JDialog {
 						}
 					}
 				});
+				
+				
 				printButton.setActionCommand("OK");
 				getRootPane().setDefaultButton(printButton);
 			}

@@ -65,7 +65,7 @@ public class MainWindow extends JFrame {
 
 		setResizable(false);
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		setBounds(100, 100, 828, 804);
+		setBounds(100, 100, 828, 771);
 
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.setBackground(SystemColor.menu);
@@ -154,15 +154,13 @@ public class MainWindow extends JFrame {
 		GroupLayout gl_mainPane = new GroupLayout(mainPane);
 		gl_mainPane.setHorizontalGroup(
 			gl_mainPane.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_mainPane.createSequentialGroup()
-					.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 799, Short.MAX_VALUE)
-					.addGap(3))
+				.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 802, Short.MAX_VALUE)
 		);
 		gl_mainPane.setVerticalGroup(
-			gl_mainPane.createParallelGroup(Alignment.TRAILING)
-				.addGroup(Alignment.LEADING, gl_mainPane.createSequentialGroup()
-					.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 716, Short.MAX_VALUE)
-					.addContainerGap())
+			gl_mainPane.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_mainPane.createSequentialGroup()
+					.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(27, Short.MAX_VALUE))
 		);
 
 		mainPane.setLayout(gl_mainPane);
