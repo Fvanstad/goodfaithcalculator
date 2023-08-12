@@ -66,6 +66,7 @@ public class PrinterWindow extends JDialog {
 	private JTextField ptFaxTF;
 	private JTextField pt2FaxTF;
 	private JProgressBar progressBar;
+	private int returnResult;
 
 	public static void main(String[] args) {
 		try {
@@ -121,12 +122,14 @@ public class PrinterWindow extends JDialog {
 			buttonPane = new JPanel();
 			{
 				printButton = new JButton("Print");
+				printButton.setToolTipText("Print the entered details onto the selected template. Will timeout after 20 seconds to stop user from being softlocked.");
 				printButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						try {
 							if(fileTree.getLastSelectedPathComponent() != null) {
 								
 								MyThread thread = new MyThread();
+								returnResult = -1;
 								thread.start();
 								printTemplate();
 								thread.join();
@@ -528,7 +531,7 @@ public class PrinterWindow extends JDialog {
 		
 		progressBar = new JProgressBar();
 		
-		JLabel lblNewLabel_1_3 = new JLabel("Do not open the Desktop when printing, it will lag the program!");
+		JLabel lblNewLabel_1_3 = new JLabel("Do not open the Desktop shortcut when printing, it will lag the program!");
 		lblNewLabel_1_3.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNewLabel_1_3.setFont(new Font("Tahoma", Font.PLAIN, 9));
 		GroupLayout gl_buttonPane = new GroupLayout(buttonPane);
@@ -720,7 +723,7 @@ public class PrinterWindow extends JDialog {
 				controller.fileChooser.setCurrentDirectory(new File("S:\\"));
 				controller.fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);;
 				controller.fileChooser.setDialogTitle("Save As");
-		    	int returnResult = controller.fileChooser.showSaveDialog(null);
+		    	returnResult = controller.fileChooser.showSaveDialog(null);
 		    	if(returnResult == JFileChooser.APPROVE_OPTION) {
 		    		File saveFile = controller.fileChooser.getSelectedFile();
 		    		document.saveToFile(saveFile + ".pdf");
@@ -741,19 +744,38 @@ public class PrinterWindow extends JDialog {
 	public class MyThread extends Thread {
 		
 		public void run() {
-			int i = 12;
-			while(i < 101) {
+			int i = 35;
+			int timeOut = 20;
+			while((i < 90 || timeOut != 0) && returnResult == -1) {
 				try {
 					progressBar.setValue(i);
-					i += 20;
-					Thread.sleep(500);
-					if(controller.fileChooser.isShowing()) {break;}
+					
+					
+					if(!controller.fileChooser.isFocusable()) {
+						i += 30;	
+					}else {
+						progressBar.setValue(100);
+					}
+					
+					if(controller.fileChooser.isFocusable()) {
+						timeOut--;
+					}
+					
+					
+					if(timeOut == 0) {
+						System.out.println("Timeout reached, closing filechooser");
+						controller.fileChooser.cancelSelection();
+						returnResult = JFileChooser.CANCEL_OPTION;
+						break;
+					}
+					
+					Thread.sleep(1000);
 				} catch (Exception e) {
 				// TODO: handle exception
 				}
 				
 			}
-			progressBar.setValue(100);
+			
 		}
 		
 	}

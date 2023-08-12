@@ -16,6 +16,7 @@ import java.util.TreeMap;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class Controller {
 
@@ -60,13 +61,16 @@ public class Controller {
 		readCodeFile();
 		readContactsFile();
 		try {
+			//UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		}catch (Exception e) {
 			
 		}
-		
+	
 		fileChooser = new JFileChooser();
-		fileChooser.setDoubleBuffered(true);
+		fileChooser.setFileFilter(new FileNameExtensionFilter("PDF (*.pdf)", "pdf", "PDF"));
+		
+		
 		
 	}
 
