@@ -6,8 +6,10 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -68,6 +70,7 @@ public class PrinterWindow extends JDialog {
 	private JTextField ptFaxTF;
 	private JTextField pt2FaxTF;
 	private JProgressBar progressBar;
+	private JFileChooser fileChooser = new JFileChooser();
 
 	public static void main(String[] args) {
 		try {
@@ -124,18 +127,23 @@ public class PrinterWindow extends JDialog {
 			buttonPane = new JPanel();
 			{
 				printButton = new JButton("Print");
-				printButton.addMouseListener(new MouseAdapter() {
-					@Override
-					public void mousePressed(MouseEvent e) {
+				printButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
 						try {
-							progressBar.setValue(5);
+
+							fileChooser = new JFileChooser();
+							MyThread thread = new MyThread();
+							thread.start();
 							printTemplate();
+							thread.join();
 						} catch (Exception e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
+			
 					}
 				});
+				
 				
 				
 				printButton.setActionCommand("OK");
@@ -599,9 +607,7 @@ public class PrinterWindow extends JDialog {
 
 	}
 
-	public void printTemplate() throws Exception {
-		
-		progressBar.setValue(10);
+	public void printTemplate() {
 
 		if(fileTree.getLastSelectedPathComponent() != null) {
 
@@ -629,7 +635,6 @@ public class PrinterWindow extends JDialog {
 			printElements.put("{{patient2.phone}}", patient2.phone);
 			printElements.put("{{patient2.fax}}", patient2.fax);
 			
-			progressBar.setValue(25);
 
 			ArrayList<String> rowData = new ArrayList(tablePane.tableMain.getRowCount());
 			String rowString;
@@ -655,11 +660,10 @@ public class PrinterWindow extends JDialog {
 				rowData.add(rowString);
 
 			}
-			
-			progressBar.setValue(50);
 
-			System.out.println("(printTemplate) " + rowData);
-			System.out.println("(printTemplate) " + fileTree.getLastSelectedPathComponent());
+
+			//System.out.println("(printTemplate) " + rowData);
+			//System.out.println("(printTemplate) " + fileTree.getLastSelectedPathComponent());
 
 			Document document;
 
@@ -681,8 +685,6 @@ public class PrinterWindow extends JDialog {
 					section.getTables().get(0);
 					Table costTable = section.addTable();
 					costTable.applyStyle("Plain Table 4");
-					
-					progressBar.setValue(65);
 
 					TextRange range = tableSelection.getAsOneRange();
 					Paragraph paragraph = range.getOwnerParagraph();
@@ -708,18 +710,15 @@ public class PrinterWindow extends JDialog {
 					}
 					costTable.addRow();
 					costTable.get(costTable.getRows().getCount() - 1, 3).addParagraph().setText("Estimated Total Due: $" + String.format("%.2f", tablePane.finalTotal));
-					progressBar.setValue(85);
 			    	}
 				
-				progressBar.setValue(100);
-				
-				JFileChooser fileChooser = new JFileChooser();
+				fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);;
 		    	fileChooser.setDialogTitle("Save As");
 		    	int returnResult = fileChooser.showSaveDialog(null);
 		    	if(returnResult == JFileChooser.APPROVE_OPTION) {
 		    		File saveFile = fileChooser.getSelectedFile();
 		    		document.saveToFile(saveFile + ".pdf");
-				
+		    		
 				}
 		    	progressBar.setValue(0);
 				
@@ -732,5 +731,26 @@ public class PrinterWindow extends JDialog {
 		}
 
 	}
+	
+	public class MyThread extends Thread {
+		
+		public void run() {
+			int i = 12;
+			while(i < 101) {
+				try {
+					progressBar.setValue(i);
+					i += 20;
+					Thread.sleep(500);
+					if(fileChooser.isShowing()) {break;}
+				} catch (Exception e) {
+				// TODO: handle exception
+				}
+				
+			}
+			progressBar.setValue(100);
+		}
+		
+	}
+	
 }
 
