@@ -39,10 +39,6 @@ import com.spire.doc.documents.Paragraph;
 import com.spire.doc.documents.TextSelection;
 import com.spire.doc.fields.TextRange;
 import javax.swing.JProgressBar;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 public class PrinterWindow extends JDialog {
 
@@ -70,7 +66,6 @@ public class PrinterWindow extends JDialog {
 	private JTextField ptFaxTF;
 	private JTextField pt2FaxTF;
 	private JProgressBar progressBar;
-	private JFileChooser fileChooser = new JFileChooser();
 
 	public static void main(String[] args) {
 		try {
@@ -111,7 +106,7 @@ public class PrinterWindow extends JDialog {
 	}
 
 	public PrinterWindow(Controller x) {
-
+		
 		controller = x;
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setAlwaysOnTop(true);
@@ -131,7 +126,6 @@ public class PrinterWindow extends JDialog {
 						try {
 							if(fileTree.getLastSelectedPathComponent() != null) {
 								
-								fileChooser = new JFileChooser();
 								MyThread thread = new MyThread();
 								thread.start();
 								printTemplate();
@@ -165,20 +159,20 @@ public class PrinterWindow extends JDialog {
 		}
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
+			groupLayout.createParallelGroup(Alignment.TRAILING)
+				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-						.addComponent(buttonPane, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 532, Short.MAX_VALUE)
-						.addComponent(panel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+						.addComponent(panel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(buttonPane, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(panel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 246, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addComponent(buttonPane, GroupLayout.PREFERRED_SIZE, 42, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap())
 		);
@@ -533,17 +527,23 @@ public class PrinterWindow extends JDialog {
 		panel.setLayout(gl_panel);
 		
 		progressBar = new JProgressBar();
+		
+		JLabel lblNewLabel_1_3 = new JLabel("Do not open the Desktop when printing, it will lag the program!");
+		lblNewLabel_1_3.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewLabel_1_3.setFont(new Font("Tahoma", Font.PLAIN, 9));
 		GroupLayout gl_buttonPane = new GroupLayout(buttonPane);
 		gl_buttonPane.setHorizontalGroup(
 			gl_buttonPane.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_buttonPane.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(progressBar, GroupLayout.PREFERRED_SIZE, 313, GroupLayout.PREFERRED_SIZE)
+					.addGroup(gl_buttonPane.createParallelGroup(Alignment.LEADING)
+						.addComponent(progressBar, Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 313, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblNewLabel_1_3, GroupLayout.DEFAULT_SIZE, 313, Short.MAX_VALUE))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(printButton, GroupLayout.PREFERRED_SIZE, 91, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(cancelButton, GroupLayout.PREFERRED_SIZE, 73, GroupLayout.PREFERRED_SIZE)
-					.addGap(0, 0, Short.MAX_VALUE))
+					.addGap(0))
 		);
 		gl_buttonPane.setVerticalGroup(
 			gl_buttonPane.createParallelGroup(Alignment.LEADING)
@@ -552,9 +552,11 @@ public class PrinterWindow extends JDialog {
 						.addGroup(gl_buttonPane.createParallelGroup(Alignment.BASELINE)
 							.addComponent(cancelButton, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE)
 							.addComponent(printButton, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_buttonPane.createSequentialGroup()
-							.addGap(11)
-							.addComponent(progressBar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+						.addGroup(Alignment.TRAILING, gl_buttonPane.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(progressBar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addGap(1)
+							.addComponent(lblNewLabel_1_3, GroupLayout.PREFERRED_SIZE, 11, GroupLayout.PREFERRED_SIZE)))
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		gl_buttonPane.linkSize(SwingConstants.VERTICAL, new Component[] {printButton, cancelButton});
@@ -715,12 +717,12 @@ public class PrinterWindow extends JDialog {
 					costTable.addRow();
 					costTable.get(costTable.getRows().getCount() - 1, 3).addParagraph().setText("Estimated Total Due: $" + String.format("%.2f", tablePane.finalTotal));
 			    	}
-				
-				fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);;
-		    	fileChooser.setDialogTitle("Save As");
-		    	int returnResult = fileChooser.showSaveDialog(null);
+				controller.fileChooser.setCurrentDirectory(new File("S:\\"));
+				controller.fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);;
+				controller.fileChooser.setDialogTitle("Save As");
+		    	int returnResult = controller.fileChooser.showSaveDialog(null);
 		    	if(returnResult == JFileChooser.APPROVE_OPTION) {
-		    		File saveFile = fileChooser.getSelectedFile();
+		    		File saveFile = controller.fileChooser.getSelectedFile();
 		    		document.saveToFile(saveFile + ".pdf");
 		    		
 				}
@@ -745,7 +747,7 @@ public class PrinterWindow extends JDialog {
 					progressBar.setValue(i);
 					i += 20;
 					Thread.sleep(500);
-					if(fileChooser.isShowing()) {break;}
+					if(controller.fileChooser.isShowing()) {break;}
 				} catch (Exception e) {
 				// TODO: handle exception
 				}
@@ -755,6 +757,5 @@ public class PrinterWindow extends JDialog {
 		}
 		
 	}
-	
 }
 

@@ -2,7 +2,7 @@ package main;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,7 +13,9 @@ import java.util.Properties;
 import java.util.Scanner;
 import java.util.TreeMap;
 
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.UIManager;
 
 public class Controller {
 
@@ -25,7 +27,7 @@ public class Controller {
 	private static String contactsFileLocation = "";
 
 	public static Scanner templateScanner = null;
-
+	public static JFileChooser fileChooser;
     public static ArrayList<String> insuranceNames = null;
     public static TreeMap<String, String> contactsList = null;
 	public static HashMap<String, HashMap<String, ArrayList>> codes = null;
@@ -57,6 +59,15 @@ public class Controller {
 		readConfigFile();
 		readCodeFile();
 		readContactsFile();
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		}catch (Exception e) {
+			
+		}
+		
+		fileChooser = new JFileChooser();
+		fileChooser.setDoubleBuffered(true);
+		
 	}
 
 	public void readConfigFile() {
@@ -245,7 +256,7 @@ public class Controller {
 			contactScanner.close();
 
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, "There was an error trying to load the contacts file.");
+			//JOptionPane.showMessageDialog(null, "There was an error trying to load the contacts file.");
 			return;
 		}
 

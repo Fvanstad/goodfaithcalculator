@@ -19,6 +19,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
@@ -31,22 +32,14 @@ public class MainWindow extends JFrame {
 
 	public static void main(String[] args) {
 
-	try {
-
-
-		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-
-    }
-    catch (Exception e) {
-       // handle exception
-    }
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 
 				try {
-
 					MainWindow frame = new MainWindow();
+					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+					SwingUtilities.updateComponentTreeUI(frame);
 					frame.setVisible(true);
 
 				} catch (Exception e) {
