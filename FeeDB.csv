@@ -1,4 +1,4 @@
-Code,Description,Department,Medport / DMA,STANDARD,PROMPT PAY,Medicare,Medicaid,BCBS ,UHC,Aetna,Cigna ,Gilsbar ,Humana MCR Rpl.,Bourgeois,Baywater,Meritain,WEB TPA
+Code,Description,Department,Medport / DMA,STANDARD (Attorney),PROMPT PAY,Medicare,Medicaid,BCBS ,UHC,Aetna,Cigna ,Gilsbar ,Humana MCR Rpl.,Bourgeois,Baywater,Meritain,WEB TPA
 EMG Bil,EMG Bilateral Extremities,,,1668,977.15,426.79,287.89,504.1,743.67,743.67,396.63,432.72,524.6,,,,
 EMG Uni,EMG Unilateral Extremities,,0,1080,612.7,276.76,179.05,328.04,462.92,238.98,211.56,9824.95,341.46,0,0,381.83,0
 99204,Office visit; new patient; level 4,Physician Services,,635,349.25,160.84,96.56,162.92,213.62,176.58,168.9,158.86,199.66,,,,

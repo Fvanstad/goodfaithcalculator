@@ -34,8 +34,8 @@ public class Controller {
 	public static HashMap<String, ArrayList> insuranceCompaniesMap = null;
 	public static int favoritesLimit = 40;
 
-	public String userName;
-	public String userTitle;
+	public String userName = "";
+	public String userTitle = "";
 	public locationOfCare locationOfCare = new locationOfCare();
 	
 	public static boolean hideCodesSetting = false;

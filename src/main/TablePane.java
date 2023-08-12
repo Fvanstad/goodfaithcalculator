@@ -14,6 +14,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.GroupLayout;
@@ -30,7 +31,10 @@ import javax.swing.SwingConstants;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
+
+import com.spire.doc.Column;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -54,7 +58,7 @@ public class TablePane extends JPanel{
 	private JLabel insuranceCount;
 	private JLabel codeCount;
 	private JLabel favoritesCount;
-	private TableModel snapShotModel;
+	private ArrayList<Integer> columnWidths = new ArrayList<Integer>();
 	
 	private boolean debugMode = false;
 
@@ -106,8 +110,8 @@ public class TablePane extends JPanel{
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(codeCount, GroupLayout.PREFERRED_SIZE, 43, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(btnNewButton, GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
-					.addContainerGap())
+					.addComponent(btnNewButton, GroupLayout.PREFERRED_SIZE, 140, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		gl_codePanel.setVerticalGroup(
 			gl_codePanel.createParallelGroup(Alignment.LEADING)
@@ -144,7 +148,7 @@ public class TablePane extends JPanel{
 		});
 		btnAddFavorite.setFont(new Font("Tahoma", Font.PLAIN, 12));
 
-		favoritesCount = new JLabel("");
+		favoritesCount = new JLabel("Y");
 		favoritesCount.setHorizontalAlignment(SwingConstants.LEFT);
 		favoritesCount.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		GroupLayout gl_favoritesPanel = new GroupLayout(favoritesPanel);
@@ -154,12 +158,12 @@ public class TablePane extends JPanel{
 					.addContainerGap()
 					.addComponent(lblNewLabel_1_1_2, GroupLayout.PREFERRED_SIZE, 90, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(favoritesCBX, 0, 487, Short.MAX_VALUE)
+					.addComponent(favoritesCBX, GroupLayout.PREFERRED_SIZE, 487, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(favoritesCount, GroupLayout.PREFERRED_SIZE, 43, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(btnAddFavorite, GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
-					.addContainerGap())
+					.addComponent(btnAddFavorite, GroupLayout.PREFERRED_SIZE, 140, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(13, Short.MAX_VALUE))
 		);
 		gl_favoritesPanel.setVerticalGroup(
 			gl_favoritesPanel.createParallelGroup(Alignment.LEADING)
@@ -167,9 +171,9 @@ public class TablePane extends JPanel{
 					.addGroup(gl_favoritesPanel.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_favoritesPanel.createParallelGroup(Alignment.BASELINE)
 							.addComponent(lblNewLabel_1_1_2)
-							.addComponent(btnAddFavorite)
 							.addComponent(favoritesCBX, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE))
-						.addComponent(favoritesCount, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE))
+						.addComponent(favoritesCount, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
+						.addComponent(btnAddFavorite))
 					.addContainerGap(11, Short.MAX_VALUE))
 		);
 		favoritesPanel.setLayout(gl_favoritesPanel);
@@ -192,6 +196,7 @@ public class TablePane extends JPanel{
 
 				}
 				catch(Exception x){
+					enteredDeductible = 0.00;
 					displayDeductibleTextField.setForeground(Color.red);
 					displayDeductibleTextField.setText("0.00");
 					setDisplayDeductibleTextFieldText("Deductible: $ 0.00");
@@ -233,7 +238,9 @@ public class TablePane extends JPanel{
 		insuranceCBX.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
+				
 				if(insuranceCBX.getSelectedItem() != "") {
+
 					codeCBX.setEnabled(true);
 					favoritesCBX.setEnabled(true);
 
@@ -278,6 +285,44 @@ public class TablePane extends JPanel{
 					codeCBX.setEnabled(false);
 					favoritesCBX.setEnabled(false);
 				}
+				
+				if(tableMain != null) {
+					
+					if(insuranceCBX.getSelectedItem() != null && insuranceCBX.getSelectedItem().toString().indexOf("(Attorney)") != -1) {
+						
+						deductibleTextField.setEnabled(false);
+						deductibleTextField.setText("");
+						
+						tableMain.getColumnModel().getColumn(2).setMaxWidth(0);
+						tableMain.getColumnModel().getColumn(3).setMaxWidth(0);
+						tableMain.getColumnModel().getColumn(5).setMaxWidth(0);
+						tableMain.getColumnModel().getColumn(6).setMaxWidth(0);
+						tableMain.getColumnModel().getColumn(4).setHeaderValue("(%) Discount Amount");
+						
+					}else {
+						
+						deductibleTextField.setEnabled(true);
+						
+						tableMain.getColumnModel().getColumn(2).setMaxWidth(2147483647);
+						tableMain.getColumnModel().getColumn(2).setPreferredWidth(columnWidths.get(3));
+						
+						tableMain.getColumnModel().getColumn(3).setMaxWidth(2147483647);
+						tableMain.getColumnModel().getColumn(3).setPreferredWidth(columnWidths.get(3));
+						
+						tableMain.getColumnModel().getColumn(5).setMaxWidth(2147483647);
+						tableMain.getColumnModel().getColumn(5).setPreferredWidth(columnWidths.get(5));
+						
+						tableMain.getColumnModel().getColumn(6).setMaxWidth(2147483647);
+						tableMain.getColumnModel().getColumn(6).setPreferredWidth(columnWidths.get(6));
+						
+						tableMain.getColumnModel().getColumn(4).setHeaderValue("(%) Co-Insurance");
+						
+					}
+					
+					calculateTotal();
+				}
+				
+				
 			}
 		});
 		insuranceCBX.setAlignmentX(Component.RIGHT_ALIGNMENT);
@@ -344,7 +389,7 @@ public class TablePane extends JPanel{
 		});
 		btnNewButton_1.setFont(new Font("Tahoma", Font.PLAIN, 11));
 
-		JButton btnNewButton_1_1 = new JButton("Share Co-Insurance\r\n");
+		JButton btnNewButton_1_1 = new JButton("Share (%)");
 		btnNewButton_1_1.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -363,7 +408,7 @@ public class TablePane extends JPanel{
 				calculateTotal();
 			}
 		});
-		btnNewButton_1_1.setToolTipText("Applies the first non-zero co-insurance value to all other rows.");
+		btnNewButton_1_1.setToolTipText("Applies the first non-zero (%) value to all other rows.");
 		btnNewButton_1_1.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		
 		JButton btnNewButton_1_1_1 = new JButton("Recalculate");
@@ -381,22 +426,22 @@ public class TablePane extends JPanel{
 					.addContainerGap()
 					.addComponent(displayDeductibleTextField, GroupLayout.PREFERRED_SIZE, 319, GroupLayout.PREFERRED_SIZE)
 					.addGap(30)
-					.addComponent(btnNewButton_1_1_1, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(btnNewButton_1_1, GroupLayout.DEFAULT_SIZE, 138, Short.MAX_VALUE)
+					.addComponent(btnNewButton_1_1_1, GroupLayout.PREFERRED_SIZE, 140, GroupLayout.PREFERRED_SIZE)
 					.addGap(4)
-					.addComponent(btnNewButton_1, GroupLayout.DEFAULT_SIZE, 137, Short.MAX_VALUE)
-					.addContainerGap())
+					.addComponent(btnNewButton_1_1, GroupLayout.PREFERRED_SIZE, 140, GroupLayout.PREFERRED_SIZE)
+					.addGap(4)
+					.addComponent(btnNewButton_1, GroupLayout.PREFERRED_SIZE, 140, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(12, Short.MAX_VALUE))
 		);
 		gl_deducPanel2.setVerticalGroup(
 			gl_deducPanel2.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_deducPanel2.createSequentialGroup()
 					.addGroup(gl_deducPanel2.createParallelGroup(Alignment.BASELINE)
 						.addComponent(displayDeductibleTextField)
-						.addComponent(btnNewButton_1)
 						.addComponent(btnNewButton_1_1)
-						.addComponent(btnNewButton_1_1_1))
-					.addContainerGap(13, Short.MAX_VALUE))
+						.addComponent(btnNewButton_1_1_1)
+						.addComponent(btnNewButton_1))
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		deducPanel2.setLayout(gl_deducPanel2);
 
@@ -412,40 +457,50 @@ public class TablePane extends JPanel{
 			new Object[][] {
 			},
 			new String[] {
-				"CPT Code", "Cost", "Affects Deductible", "Co-Pay", "(%) Co-Insurance", "To Deductable", "Remaining Deductile", "To Total"
+				"CPT Code", "Cost", "Affects Deduc.", "Co-Pay", "(%) Co-Insurance", "To Deduc.", "Remaining Deduc.", "To Total"
 			}
 		) {
 			Class[] columnTypes = new Class[] {
 				String.class, String.class, Boolean.class, String.class, String.class, String.class, String.class, String.class
 			};
-			@Override
 			public Class getColumnClass(int columnIndex) {
 				return columnTypes[columnIndex];
 			}
 			boolean[] columnEditables = new boolean[] {
-				false, true, true, true, true, false, false, false
+				false, true, true, true, true, true, true, true
 			};
-			@Override
 			public boolean isCellEditable(int row, int column) {
 				return columnEditables[column];
 			}
 		});
 		tableMain.getColumnModel().getColumn(0).setResizable(false);
-		tableMain.getColumnModel().getColumn(0).setPreferredWidth(74);
+		tableMain.getColumnModel().getColumn(0).setPreferredWidth(70);
+		tableMain.getColumnModel().getColumn(0).setMinWidth(0);
 		tableMain.getColumnModel().getColumn(1).setResizable(false);
 		tableMain.getColumnModel().getColumn(1).setPreferredWidth(70);
+		tableMain.getColumnModel().getColumn(1).setMinWidth(0);
 		tableMain.getColumnModel().getColumn(2).setResizable(false);
-		tableMain.getColumnModel().getColumn(2).setPreferredWidth(100);
-		tableMain.getColumnModel().getColumn(2).setMinWidth(50);
+		tableMain.getColumnModel().getColumn(2).setPreferredWidth(90);
+		tableMain.getColumnModel().getColumn(2).setMinWidth(0);
 		tableMain.getColumnModel().getColumn(3).setResizable(false);
+		tableMain.getColumnModel().getColumn(3).setPreferredWidth(70);
+		tableMain.getColumnModel().getColumn(3).setMinWidth(0);
 		tableMain.getColumnModel().getColumn(4).setResizable(false);
-		tableMain.getColumnModel().getColumn(4).setPreferredWidth(102);
+		tableMain.getColumnModel().getColumn(4).setPreferredWidth(90);
+		tableMain.getColumnModel().getColumn(4).setMinWidth(0);
 		tableMain.getColumnModel().getColumn(5).setResizable(false);
-		tableMain.getColumnModel().getColumn(5).setPreferredWidth(80);
+		tableMain.getColumnModel().getColumn(5).setPreferredWidth(70);
+		tableMain.getColumnModel().getColumn(5).setMinWidth(0);
 		tableMain.getColumnModel().getColumn(6).setResizable(false);
-		tableMain.getColumnModel().getColumn(6).setPreferredWidth(114);
+		tableMain.getColumnModel().getColumn(6).setPreferredWidth(100);
+		tableMain.getColumnModel().getColumn(6).setMinWidth(0);
 		tableMain.getColumnModel().getColumn(7).setResizable(false);
-
+		tableMain.getColumnModel().getColumn(7).setMinWidth(0);
+		
+		for (int i = 0; i < tableMain.getColumnCount(); i++) {
+			//Store Preferred Widths so that they can be referenced to restore columns after attrny insurance selection
+			columnWidths.add(tableMain.getColumnModel().getColumn(i).getPreferredWidth());
+		}
 		//ADD LISTENER TO CALL CALCULATE TOTAL AUTO...
 
 		tableMain.getModel().addTableModelListener(new TableModelListener() {
@@ -475,12 +530,6 @@ public class TablePane extends JPanel{
 					calculateTotal();
 				}
 				
-				
-				if(snapShotModel != null && tableMain.getModel() != snapShotModel) {
-					
-					calculateTotal();
-				}
-				snapShotModel = tableMain.getModel();
 			}
 		});
 
@@ -600,7 +649,7 @@ public class TablePane extends JPanel{
             //rowInfo [0] is cost ... [4] is deductible met amt
             double cost = Double.parseDouble(String.valueOf(rowInfo.get(0)));
             boolean countsToDeduc = Boolean.parseBoolean(String.valueOf(rowInfo.get(1)));
-            double copay = Double.parseDouble(String.valueOf(rowInfo.get(2)));
+            double copay = insuranceCBX.getSelectedItem().toString().indexOf("(Attorney)") == -1 ? Double.parseDouble(String.valueOf(rowInfo.get(2))) : 0;
             double coinsurancePercent = Double.parseDouble(String.valueOf(rowInfo.get(3)));
             double deductibleMetAmount = Double.parseDouble(String.valueOf(rowInfo.get(4)));
             double rowTotal = 0;

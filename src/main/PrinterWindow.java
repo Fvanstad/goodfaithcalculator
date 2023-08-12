@@ -1,6 +1,7 @@
 package main;
 
 import java.awt.Component;
+
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,6 +16,7 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -34,11 +36,12 @@ import com.spire.doc.Table;
 import com.spire.doc.documents.Paragraph;
 import com.spire.doc.documents.TextSelection;
 import com.spire.doc.fields.TextRange;
+import javax.swing.JProgressBar;
 
 public class PrinterWindow extends JDialog {
 
-	private static Controller controller;
-	public TablePane tablePane;
+	private static Controller controller = new Controller();
+	public static TablePane tablePane;
 
 	protected Patient patient;
 	protected Patient patient2;
@@ -60,13 +63,15 @@ public class PrinterWindow extends JDialog {
 	private JTextField pt2PhoneTF;
 	private JTextField ptFaxTF;
 	private JTextField pt2FaxTF;
+	private JProgressBar progressBar;
 
 	public static void main(String[] args) {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			new PrinterWindow(controller);
+			new PrinterWindow(controller, tablePane);
 
 		} catch (Exception e) {
+			new PrinterWindow(new Controller(), new TablePane(controller));
 			e.printStackTrace();
 		}
 	}
@@ -98,9 +103,13 @@ public class PrinterWindow extends JDialog {
 
 	}
 
-	public PrinterWindow(Controller x) {
+	public PrinterWindow(Controller x, TablePane y) {
+		this.tablePane = y;
+		controller = x;
 
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		setAlwaysOnTop(true);
+		
 		setVisible(true);
 		setTitle("Print Calculation");
 		controller = x;
@@ -115,6 +124,7 @@ public class PrinterWindow extends JDialog {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						try {
+							progressBar.setValue(5);
 							printTemplate();
 						} catch (Exception e1) {
 							// TODO Auto-generated catch block
@@ -182,14 +192,14 @@ public class PrinterWindow extends JDialog {
 		JPanel panel_1 = new JPanel();
 		tabbedPane.addTab("User Information", null, panel_1, null);
 
-		userNameTF = new JTextField(controller.userName);
+		userNameTF = new JTextField();
 		userNameTF.setColumns(10);
 
 		JLabel lblNewLabel_1 = new JLabel("Full Name:");
 		lblNewLabel_1.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		lblNewLabel_1.setHorizontalAlignment(SwingConstants.RIGHT);
 
-		userTitleTF = new JTextField(controller.userTitle);
+		userTitleTF = new JTextField();
 		userTitleTF.setColumns(10);
 
 		JLabel lblNewLabel_1_1 = new JLabel("Title:");
@@ -210,16 +220,16 @@ public class PrinterWindow extends JDialog {
 			gl_panel_1.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_1.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-						.addGroup(Alignment.TRAILING, gl_panel_1.createSequentialGroup()
+					.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING, false)
+						.addGroup(gl_panel_1.createSequentialGroup()
 							.addComponent(lblNewLabel_1, GroupLayout.PREFERRED_SIZE, 79, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(userNameTF, GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE))
-						.addGroup(Alignment.TRAILING, gl_panel_1.createSequentialGroup()
+							.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+							.addComponent(userNameTF, GroupLayout.PREFERRED_SIZE, 218, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel_1.createSequentialGroup()
 							.addComponent(lblNewLabel_1_1, GroupLayout.PREFERRED_SIZE, 79, GroupLayout.PREFERRED_SIZE)
 							.addGap(4)
 							.addComponent(userTitleTF, GroupLayout.PREFERRED_SIZE, 218, GroupLayout.PREFERRED_SIZE))
-						.addComponent(btnNewButton, Alignment.TRAILING))
+						.addComponent(btnNewButton))
 					.addContainerGap())
 		);
 		gl_panel_1.setVerticalGroup(
@@ -503,21 +513,30 @@ public class PrinterWindow extends JDialog {
 		scrollPane.setViewportView(fileTree);
 
 		panel.setLayout(gl_panel);
+		
+		progressBar = new JProgressBar();
 		GroupLayout gl_buttonPane = new GroupLayout(buttonPane);
 		gl_buttonPane.setHorizontalGroup(
 			gl_buttonPane.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_buttonPane.createSequentialGroup()
-					.addContainerGap(329, Short.MAX_VALUE)
+					.addContainerGap()
+					.addComponent(progressBar, GroupLayout.PREFERRED_SIZE, 313, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(printButton, GroupLayout.PREFERRED_SIZE, 91, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(cancelButton, GroupLayout.PREFERRED_SIZE, 73, GroupLayout.PREFERRED_SIZE))
+					.addComponent(cancelButton, GroupLayout.PREFERRED_SIZE, 73, GroupLayout.PREFERRED_SIZE)
+					.addGap(0, 0, Short.MAX_VALUE))
 		);
 		gl_buttonPane.setVerticalGroup(
-			gl_buttonPane.createParallelGroup(Alignment.TRAILING)
-				.addGroup(Alignment.LEADING, gl_buttonPane.createSequentialGroup()
-					.addGroup(gl_buttonPane.createParallelGroup(Alignment.BASELINE)
-						.addComponent(cancelButton, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE)
-						.addComponent(printButton, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE))
+			gl_buttonPane.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_buttonPane.createSequentialGroup()
+					.addGroup(gl_buttonPane.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_buttonPane.createParallelGroup(Alignment.BASELINE)
+							.addComponent(cancelButton, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE)
+							.addComponent(printButton, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_buttonPane.createSequentialGroup()
+							.addGap(11)
+							.addComponent(progressBar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		gl_buttonPane.linkSize(SwingConstants.VERTICAL, new Component[] {printButton, cancelButton});
@@ -526,6 +545,15 @@ public class PrinterWindow extends JDialog {
 		getContentPane().setLayout(groupLayout);
 
 		getTemplates();
+		getUserInfo();
+		
+	}
+
+	private void getUserInfo() {
+		
+		userNameTF.setText(controller.userName);
+		userTitleTF.setText(controller.userTitle);
+		
 	}
 
 	public void createPatientClass() {
@@ -566,6 +594,8 @@ public class PrinterWindow extends JDialog {
 	}
 
 	public void printTemplate() throws Exception {
+		
+		progressBar.setValue(10);
 
 		if(fileTree.getLastSelectedPathComponent() != null) {
 
@@ -592,6 +622,8 @@ public class PrinterWindow extends JDialog {
 			printElements.put("{{patient2.address}}", patient2.address);
 			printElements.put("{{patient2.phone}}", patient2.phone);
 			printElements.put("{{patient2.fax}}", patient2.fax);
+			
+			progressBar.setValue(25);
 
 			ArrayList<String> rowData = new ArrayList(tablePane.tableMain.getRowCount());
 			String rowString;
@@ -617,6 +649,8 @@ public class PrinterWindow extends JDialog {
 				rowData.add(rowString);
 
 			}
+			
+			progressBar.setValue(50);
 
 			System.out.println("(printTemplate) " + rowData);
 			System.out.println("(printTemplate) " + fileTree.getLastSelectedPathComponent());
@@ -633,16 +667,16 @@ public class PrinterWindow extends JDialog {
 
 			}
 
-			TextSelection tableSelection = null;
-
 			try {
 				if(tablePane.tableMain.getRowCount() > 0) {
-					tableSelection = document.findString("{{table}}", true, true);
+					TextSelection tableSelection = document.findString("{{table}}", true, true);
 
 					Section section = document.getSections().get(0);
 					section.getTables().get(0);
 					Table costTable = section.addTable();
 					costTable.applyStyle("Plain Table 4");
+					
+					progressBar.setValue(65);
 
 					TextRange range = tableSelection.getAsOneRange();
 					Paragraph paragraph = range.getOwnerParagraph();
@@ -668,8 +702,10 @@ public class PrinterWindow extends JDialog {
 					}
 					costTable.addRow();
 					costTable.get(costTable.getRows().getCount() - 1, 3).addParagraph().setText("Estimated Total Due: $" + String.format("%.2f", tablePane.finalTotal));
-
+					progressBar.setValue(85);
 			    	}
+				
+				progressBar.setValue(100);
 				
 				JFileChooser fileChooser = new JFileChooser();
 		    	fileChooser.setDialogTitle("Save As");
@@ -679,12 +715,13 @@ public class PrinterWindow extends JDialog {
 		    		document.saveToFile(saveFile + ".pdf");
 				
 				}
-	    	
+		    	progressBar.setValue(0);
+				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			
-
+			
 
 		}
 

@@ -130,7 +130,7 @@ public class MainWindow extends JFrame {
 		mntmNewMenuItem_2.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				PrinterWindow printerWindow = new PrinterWindow(controller);
+				PrinterWindow printerWindow = new PrinterWindow(controller, (TablePane) tabbedPane.getComponentAt(tabbedPane.getSelectedIndex()));
 				try {
 					printerWindow.tablePane = (TablePane) tabbedPane.getSelectedComponent();
 				} catch (Exception e2) {
