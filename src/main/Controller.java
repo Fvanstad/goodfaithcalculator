@@ -176,8 +176,10 @@ public class Controller {
 		
 		File contactsFile;
 		Scanner contactScanner;
+		List<String> input = new ArrayList();
 		
 		try {
+			
 			contactsFile = new File(contactsFileLocation);
 			contactScanner = new Scanner(contactsFile);
 			contactsList = new TreeMap();
@@ -190,7 +192,7 @@ public class Controller {
 			//int faxIndex;
 
 			while(contactScanner.hasNext()) {
-				List<String> input = Arrays.asList(contactScanner.nextLine().split("\\|"));
+				input = Arrays.asList(contactScanner.nextLine().split("\\|"));
 				if((input.contains("Name") && nameIndex == -1)) {
 					//Find the index(s) of needed data
 					nameIndex = input.indexOf("Name");
@@ -202,10 +204,10 @@ public class Controller {
 					break;
 				}
 			}
-
+			
 			while(contactScanner.hasNext()) {
-
-				List<String> input = Arrays.asList(Arrays.copyOf(contactScanner.nextLine().split("\\|"), phoneIndex + 1));
+				
+				input = Arrays.asList(Arrays.copyOf(contactScanner.nextLine().split("\\|"), phoneIndex + 1));
 
 				Scanner tempScanner = contactScanner;
 				List<String> tempInput = null;
@@ -242,13 +244,12 @@ public class Controller {
 			
 			contactScanner.close();
 
-		} catch (FileNotFoundException e) {
-			//JOptionPane.showMessageDialog(null, "There was an error trying to load the contacts file.");
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, "There was an error trying to load the contacts file.");
 			return;
 		}
 
-
-
+		
 	}
 
 	public void setUserName(String x) {

@@ -37,6 +37,8 @@ import javax.swing.table.TableModel;
 import com.spire.doc.Column;
 
 import net.miginfocom.swing.MigLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 
 public class TablePane extends JPanel{
@@ -88,12 +90,13 @@ public class TablePane extends JPanel{
 		codeCBX.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 
 		JButton btnNewButton = new JButton("Add Code\r\n");
-		btnNewButton.addActionListener(new ActionListener() {
+		btnNewButton.addMouseListener(new MouseAdapter() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void mousePressed(MouseEvent e) {
 				addRowNormal();
 			}
 		});
+		
 		btnNewButton.setFont(new Font("Tahoma", Font.PLAIN, 12));
 
 		codeCount = new JLabel("X\r\n");
@@ -140,12 +143,13 @@ public class TablePane extends JPanel{
 		favoritesCBX.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 
 		JButton btnAddFavorite = new JButton("Add Favorite\r\n");
-		btnAddFavorite.addActionListener(new ActionListener() {
+		btnAddFavorite.addMouseListener(new MouseAdapter() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void mousePressed(MouseEvent e) {
 				addRowFavorite();
 			}
 		});
+		
 		btnAddFavorite.setFont(new Font("Tahoma", Font.PLAIN, 12));
 
 		favoritesCount = new JLabel("Y");
@@ -370,9 +374,9 @@ public class TablePane extends JPanel{
 		displayDeductibleTextField.setFont(new Font("Tahoma", Font.PLAIN, 14));
 
 		JButton btnNewButton_1 = new JButton("Remove Row(s)");
-		btnNewButton_1.addActionListener(new ActionListener() {
+		btnNewButton_1.addMouseListener(new MouseAdapter() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void mousePressed(MouseEvent e) {
 				if(tableMain.getRowCount() == 0) {return;}
 				DefaultTableModel model = (DefaultTableModel) tableMain.getModel();
 				int[] selectedRows = tableMain.getSelectedRows();
@@ -384,15 +388,17 @@ public class TablePane extends JPanel{
 					model.removeRow(tableMain.getRowCount() -1);
 
 				}
-				calculateTotal();
+				
 			}
 		});
+		
 		btnNewButton_1.setFont(new Font("Tahoma", Font.PLAIN, 11));
 
 		JButton btnNewButton_1_1 = new JButton("Share (%)");
-		btnNewButton_1_1.addActionListener(new ActionListener() {
+		btnNewButton_1_1.addMouseListener(new MouseAdapter() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void mousePressed(MouseEvent e) {
+				
 				String coInsuranceAmnt = null;
 				for(int i = 0; i < tableMain.getRowCount(); i++) {
 					
@@ -406,17 +412,21 @@ public class TablePane extends JPanel{
 					
 				}
 				calculateTotal();
+				
 			}
 		});
+		
 		btnNewButton_1_1.setToolTipText("Applies the first non-zero (%) value to all other rows.");
 		btnNewButton_1_1.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		
 		JButton btnNewButton_1_1_1 = new JButton("Recalculate");
-		btnNewButton_1_1_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		btnNewButton_1_1_1.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
 				calculateTotal();
 			}
 		});
+	
 		btnNewButton_1_1_1.setToolTipText("Forces a recalculate.");
 		btnNewButton_1_1_1.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		GroupLayout gl_deducPanel2 = new GroupLayout(deducPanel2);

@@ -121,7 +121,7 @@ public class MainWindow extends JFrame {
 		mntmNewMenuItem_3.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Controller.hideCodesSetting = !Controller.hideCodesSetting;
+				controller.hideCodesSetting = !controller.hideCodesSetting;
 			}
 		});
 		mnOptions.add(mntmNewMenuItem_3);
@@ -130,7 +130,7 @@ public class MainWindow extends JFrame {
 		mntmNewMenuItem_2.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				PrinterWindow printerWindow = new PrinterWindow(controller, (TablePane) tabbedPane.getComponentAt(tabbedPane.getSelectedIndex()));
+				PrinterWindow printerWindow = new PrinterWindow(controller);
 				try {
 					printerWindow.tablePane = (TablePane) tabbedPane.getSelectedComponent();
 				} catch (Exception e2) {

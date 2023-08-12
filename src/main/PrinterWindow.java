@@ -49,8 +49,8 @@ public class PrinterWindow extends JDialog {
 	private static Controller controller;
 	public static TablePane tablePane;
 
-	protected Patient patient;
-	protected Patient patient2;
+	protected Person patient;
+	protected Person addressee;
 
 	private JPanel buttonPane;
 	private JButton printButton;
@@ -75,15 +75,15 @@ public class PrinterWindow extends JDialog {
 	public static void main(String[] args) {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			new PrinterWindow(controller, tablePane);
+			new PrinterWindow(controller);
 
 		} catch (Exception e) {
-			new PrinterWindow(new Controller(), new TablePane(controller));
+			new PrinterWindow(new Controller());
 			e.printStackTrace();
 		}
 	}
 
-	protected class Patient{
+	protected class Person{
 
 		protected String name = "(!*NO NAME*!)";
 		protected String DOB = "(!*NO DOB*!)";
@@ -93,7 +93,7 @@ public class PrinterWindow extends JDialog {
 		protected String phone = "(!*NO PHONE*!)";
 		protected String fax = "(!*NO FAX*!)";
 
-		public Patient(String name, String DOB, String id, String address, String phone, String fax) {
+		public Person(String name, String DOB, String id, String address, String phone, String fax) {
 			this.name = name;
 			this.DOB = DOB;
 			this.id = id;
@@ -101,7 +101,7 @@ public class PrinterWindow extends JDialog {
 			this.phone = phone;
 		}
 
-		public Patient(String name, String address, String phone, String fax) {
+		public Person(String name, String address, String phone, String fax) {
 			this.name = name;
 			this.address = address;
 			this.phone = phone;
@@ -110,10 +110,9 @@ public class PrinterWindow extends JDialog {
 
 	}
 
-	public PrinterWindow(Controller x, TablePane y) {
-		this.tablePane = y;
-		controller = x;
+	public PrinterWindow(Controller x) {
 
+		controller = x;
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setAlwaysOnTop(true);
 		
@@ -130,12 +129,16 @@ public class PrinterWindow extends JDialog {
 				printButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						try {
-
-							fileChooser = new JFileChooser();
-							MyThread thread = new MyThread();
-							thread.start();
-							printTemplate();
-							thread.join();
+							if(fileTree.getLastSelectedPathComponent() != null) {
+								
+								fileChooser = new JFileChooser();
+								MyThread thread = new MyThread();
+								thread.start();
+								printTemplate();
+								thread.join();
+								
+							}
+							
 						} catch (Exception e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
@@ -442,14 +445,15 @@ public class PrinterWindow extends JDialog {
 				if(comboBox.getSelectedItem() != "") {
 					String selectedItem = comboBox.getSelectedItem().toString();
 					pt2NameTF.setText(selectedItem);
-					pt2AddressTF.setText(Controller.contactsList.get(selectedItem).split("\\|")[0]);
-					pt2PhoneTF.setText(Controller.contactsList.get(selectedItem).split("\\|")[1]);
+					pt2AddressTF.setText(controller.contactsList.get(selectedItem).split("\\|")[0]);
+					pt2PhoneTF.setText(controller.contactsList.get(selectedItem).split("\\|")[1]);
 				}
 
 			}
 		});
 
-		for (String s : Controller.contactsList.keySet()) {
+		for (String s : controller.contactsList.keySet()) {
+			
 			comboBox.addItem(s);
 		}
 
@@ -572,8 +576,8 @@ public class PrinterWindow extends JDialog {
 
 	public void createPatientClass() {
 
-		patient = new Patient(ptNameTF.getText(), ptDOBTF.getText(), ptIDTF.getText(), ptAddressTF.getText(), ptPhoneTF.getText(), ptFaxTF.getText());
-		patient2 = new Patient(pt2NameTF.getText(), pt2AddressTF.getText(), pt2PhoneTF.getText(), pt2FaxTF.getText());
+		patient = new Person(ptNameTF.getText(), ptDOBTF.getText(), ptIDTF.getText(), ptAddressTF.getText(), ptPhoneTF.getText(), ptFaxTF.getText());
+		addressee = new Person(pt2NameTF.getText(), pt2AddressTF.getText(), pt2PhoneTF.getText(), pt2FaxTF.getText());
 
 	}
 
@@ -630,10 +634,10 @@ public class PrinterWindow extends JDialog {
 			printElements.put("{{patient.phone}}", patient.phone);
 			printElements.put("{{patient.fax}}", patient.fax);
 
-			printElements.put("{{patient2.name}}", patient2.name);
-			printElements.put("{{patient2.address}}", patient2.address);
-			printElements.put("{{patient2.phone}}", patient2.phone);
-			printElements.put("{{patient2.fax}}", patient2.fax);
+			printElements.put("{{addressee.name}}", addressee.name);
+			printElements.put("{{addressee.address}}", addressee.address);
+			printElements.put("{{addressee.phone}}", addressee.phone);
+			printElements.put("{{addressee.fax}}", addressee.fax);
 			
 
 			ArrayList<String> rowData = new ArrayList(tablePane.tableMain.getRowCount());
@@ -645,7 +649,7 @@ public class PrinterWindow extends JDialog {
 				rowString = "";
 				for (int j = 0; j < tablePane.tableMain.getColumnCount(); j++) {
 					if(j == 1) {
-						rowString += Controller.codeDescriptions.get(tablePane.tableMain.getValueAt(i,0).toString()) + "|";
+						rowString += controller.codeDescriptions.get(tablePane.tableMain.getValueAt(i,0).toString()) + "|";
 						rowString += tablePane.tableMain.getValueAt(i,1).toString() + "|";
 						continue;
 					}
@@ -654,7 +658,7 @@ public class PrinterWindow extends JDialog {
 					}else{
 						rowString += tablePane.tableMain.getValueAt(i,j).toString();
 					}
-
+					
 				}
 
 				rowData.add(rowString);
@@ -712,7 +716,7 @@ public class PrinterWindow extends JDialog {
 					costTable.get(costTable.getRows().getCount() - 1, 3).addParagraph().setText("Estimated Total Due: $" + String.format("%.2f", tablePane.finalTotal));
 			    	}
 				
-				fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);;
+				fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);;
 		    	fileChooser.setDialogTitle("Save As");
 		    	int returnResult = fileChooser.showSaveDialog(null);
 		    	if(returnResult == JFileChooser.APPROVE_OPTION) {
