@@ -12,8 +12,10 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.TreeMap;
+import java.util.concurrent.FutureTask;
 
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -66,10 +68,9 @@ public class Controller {
 		}catch (Exception e) {
 			
 		}
-	
+		
 		fileChooser = new JFileChooser();
 		fileChooser.setFileFilter(new FileNameExtensionFilter("PDF (*.pdf)", "pdf", "PDF"));
-		
 		
 		
 	}

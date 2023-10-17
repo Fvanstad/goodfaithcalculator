@@ -58,7 +58,7 @@ public class MainWindow extends JFrame {
 
 		setResizable(false);
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		setBounds(100, 100, 828, 771);
+		setBounds(100, 100, 841, 771);
 
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.setBackground(SystemColor.menu);

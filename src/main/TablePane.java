@@ -210,7 +210,7 @@ public class TablePane extends JPanel{
 		deductibleTextField.setName("");
 		deductibleTextField.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		
-		JLabel lblNewLabel_1_1_2_1 = new JLabel("Deductible: $  ");
+		JLabel lblNewLabel_1_1_2_1 = new JLabel("Deductible:");
 		lblNewLabel_1_1_2_1.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblNewLabel_1_1_2_1.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		GroupLayout gl_deducPanel = new GroupLayout(deducPanel);
@@ -218,8 +218,8 @@ public class TablePane extends JPanel{
 			gl_deducPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_deducPanel.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(lblNewLabel_1_1_2_1, GroupLayout.PREFERRED_SIZE, 90, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(lblNewLabel_1_1_2_1, GroupLayout.PREFERRED_SIZE, 84, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addComponent(deductibleTextField, GroupLayout.PREFERRED_SIZE, 214, GroupLayout.PREFERRED_SIZE)
 					.addGap(474))
 		);
@@ -229,7 +229,7 @@ public class TablePane extends JPanel{
 					.addGroup(gl_deducPanel.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblNewLabel_1_1_2_1, GroupLayout.PREFERRED_SIZE, 17, GroupLayout.PREFERRED_SIZE)
 						.addComponent(deductibleTextField, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+					.addContainerGap(11, Short.MAX_VALUE))
 		);
 		deducPanel.setLayout(gl_deducPanel);
 		panel.setLayout(new GridLayout(0, 1, 0, 0));

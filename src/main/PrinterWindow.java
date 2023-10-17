@@ -6,10 +6,9 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
+import java.util.zip.CheckedOutputStream;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -36,8 +35,11 @@ import com.spire.doc.Document;
 import com.spire.doc.Section;
 import com.spire.doc.Table;
 import com.spire.doc.documents.Paragraph;
+import com.spire.doc.documents.Style;
 import com.spire.doc.documents.TextSelection;
 import com.spire.doc.fields.TextRange;
+import com.spire.doc.formatting.CharacterFormat;
+
 import javax.swing.JProgressBar;
 
 public class PrinterWindow extends JDialog {
@@ -708,18 +710,35 @@ public class PrinterWindow extends JDialog {
 					costTable.get(0, 1).addParagraph().setText("Service Description");
 			        costTable.get(0, 2).addParagraph().setText("Full Undiscounted Fee");
 			        costTable.get(0, 3).addParagraph().setText("Contractual Discounted Fee");
-
+			       
+			       
 			        for(int i = 0; i < rowData.size(); i++) {
 			        	String[] tempRowData = rowData.get(i).split("\\|");
+			        	
+			        	//Set "Service Requested" Column
 
 						costTable.get(i + 1, 0).addParagraph().setText(tempRowData[0]);
+						
+						//Set "Service Description" Column
+						
 						costTable.get(i + 1, 1).addParagraph().setText(tempRowData[1]);
-						costTable.get(i + 1, 2).addParagraph().setText(tempRowData[2]);
-						costTable.get(i + 1, 3).addParagraph().setText(tempRowData[tempRowData.length-1]);
+						costTable.get(i + 1, 1).setWidth(160);
+						
+						//Set "Full Undiscounted Fee" Column & Format Amount
+						
+						costTable.get(i + 1, 2).addParagraph().setText("$ " + String.format("%.2f", Double.valueOf(tempRowData[2])));
+						
+						//Set "Contractual Discounted Fee" Column & Format Amount
+						 
+						costTable.get(i + 1, 3).addParagraph().setText("$ " + String.format("%.2f", Double.valueOf(tempRowData[tempRowData.length-1])));
 					}
 					costTable.addRow();
 					costTable.get(costTable.getRows().getCount() - 1, 3).addParagraph().setText("Estimated Total Due: $" + String.format("%.2f", tablePane.finalTotal));
+					
+					
 			    	}
+				
+				
 				controller.fileChooser.setCurrentDirectory(new File("S:\\"));
 				controller.fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);;
 				controller.fileChooser.setDialogTitle("Save As");
@@ -744,8 +763,11 @@ public class PrinterWindow extends JDialog {
 	public class MyThread extends Thread {
 		
 		public void run() {
-			int i = 35;
-			int timeOut = 20;
+			int i = 60;
+			
+			//How long before the printer automatically closes (in case of lag)
+			
+			int timeOut = 40;
 			while((i < 90 || timeOut != 0) && returnResult == -1) {
 				try {
 					progressBar.setValue(i);
